@@ -64,7 +64,7 @@ var utils = {};
 		initTable(JSONData);
 	}
 	function initMaps(JSONdata){
-	$('#wellsMap').kendoMap({
+	$('#map').kendoMap({
     	center: [39.5, -120],
         zoom: 4,
         minSize: 300,
