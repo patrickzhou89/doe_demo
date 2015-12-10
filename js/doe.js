@@ -85,7 +85,7 @@ var utils = {};
 				},
 				pageSize: 22
 			},
-			height: 550,
+			height: 600,
 			scrollable: true,
 			sortable: true,
 			filterable: true,
@@ -131,6 +131,7 @@ var utils = {};
 			title : {
 				text : "Wells Per State"
 			},
+			theme:"material",
 			dataSource : lineChartDatasource,
 			series : [ {
 				type : "line",
@@ -174,8 +175,6 @@ var utils = {};
 			group:{field: "state",
 				aggregates: [{ field: "numOilWells", aggregate: "sum" }]
 			}
-			
-			
 		});
 		pieChartDatasource.read();
 		
@@ -186,13 +185,14 @@ var utils = {};
 		//create the chart series  
 		for (var i = 0; i < length; i++) {
 			item = items[i];
-			series.push({ category: item.value, value: item.aggregates.numOilWells.sum})
+			series.push({ category: item.value, value: item.aggregates.numOilWells.sum,padding:0})
 		}
 		dsRegistry.push(pieChartDatasource);
 		$("#pieChart").kendoChart({
 			title : {
 				text : "Wells Per State"
 			},
+			theme:"material",
 			seriesDefaults: {
 				type: "pie"
 			},
@@ -352,10 +352,10 @@ var utils = {};
 				initFiltering(DOEData);
 				initCharts(DOEData);					
 			});
-		$.get('data/states_hash.json', {}, 
-			function(result) {
-				DOEStateMap = result;				
-			});		
+		// $.get('data/states_hash.json', {}, 
+		// 	function(result) {
+		// 		DOEStateMap = result;				
+		// 	});		
 	}
 	
 	$(init);
@@ -395,7 +395,7 @@ var utils = {};
             });
         },
         close: function(){
-        	this.wrapper.find('#filename').val('');
+        	//this.wrapper.find('#filename').val('');
         }
     }).data('kendoWindow');
     $('#modal').siblings('.k-header').remove();
@@ -474,6 +474,7 @@ var utils = {};
                 },
                 close: function(){
                 	//reset filename field
+                	console.log(this.wrapper)
                 	this.wrapper.find('#filename').val('');
                 }
             }).data('kendoWindow');
@@ -564,8 +565,8 @@ var utils = {};
             };
         },
         cancelExport: function() {
-            var modalWindow = $('#modal').data('kendoWindow');
-            modalWindow.close();
+        	//console.log('jdad');
+            $('#modal').data('kendoWindow').close();
         }
     };
     kendo.bind($('#modal'), kendo.observable(modalEvents));
