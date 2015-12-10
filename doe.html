@@ -10,7 +10,11 @@
 
 </head>
 <body>
-	<div id='header'></div>
+	<div id='header'>
+		<div id='menu-wrapper'>
+			<img id='filter-button' data-bind='click:toggleFiltering'src='css/images/menu-icon.png'/>
+		</div>
+	</div>
 	<div id='content'>
 		<div id='sidebar'>
 			<ul>
@@ -63,6 +67,7 @@
 		</div>
 	</div>
 	<script src="js/jquery-1.11.3.min.js"></script>
+	<script src="js/jquery-ui.min.js"></script>
 	<script src="js/kendo.all.min.js"></script>
 	<script src="js/lodash.min.js"></script>
 	<script src="js/doe.js"></script>

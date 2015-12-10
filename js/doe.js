@@ -187,3 +187,19 @@ var DOE = {};
 	$(init);
 	
 }());
+
+(function(){
+	var header = {
+		toggleFiltering:function(){
+			$('#filter-bar').toggle('slide',{direction:'right'},200);
+		}
+	};
+	kendo.bind($('#header'), kendo.observable(header));
+
+	var sidebar = {
+		toggleFiltering:function(){
+			this.toggle();
+		}
+	};
+	kendo.bind($('#sidebar'), kendo.observable(header));
+}());
