@@ -8,7 +8,7 @@ var DOE = {};
 	
 	var database = new kendo.data.DataSource({
 		transport: {
-			read: 'data/states.json'
+			read: 'data/statesNewer.json'
 		},
 		filter: {
 			logic: 'and',
@@ -36,6 +36,81 @@ var DOE = {};
 			};			
 		}
 		database.filter(newFilter);
+	}
+	
+	function initCharts(){
+		var lineChartDatasource = 	new kendo.data.DataSource({
+			schema : {
+				model : {
+					fields : {
+						prodYear : {
+							type : 'date'
+						},
+						state : {
+							type : 'string'
+						},
+						rateClass : {
+							type : 'number'
+						},
+						numOilWells : {
+							type : 'number'
+						}
+						
+					}
+				}
+			},
+			transport: {
+				read: 'data/statesNewer.json',
+				dataType:"json"
+			},
+			group : {
+				field : "state"
+			},
+			sort : {
+				field : "prodYear",
+				dir : "asc"
+		}});
+		
+		$("#data-visulizer").kendoChart({
+			title : {
+				text : "Wells Per State"
+			},
+			dataSource : lineChartDatasource,
+			series : [ {
+				type : "line",
+				field : "numOilWells",
+				categoryField : 'prodYear',
+				name : "#= group.value #",
+				aggregate : "sum",
+				padding : 10, 
+				colorField: 'color'
+			} ],
+			legend : {
+				position : "bottom",
+				visible : true
+			},
+			valueAxis : {
+				labels : {
+					format : "{0}"
+				}
+			},
+			categoryAxis : {
+				field : "prodYear",
+				baseUnit : "fit",
+				type : 'date',
+				labels : {
+					format : "yyyy",
+					rotation : 315
+				}
+			},
+			tooltip : {
+				visible : true,
+				template : "State: #= series.name #: #= value #"
+			}
+		});
+			
+			
+			
 	}
 	
 	function initFiltering() {
@@ -192,6 +267,7 @@ var DOE = {};
 		databaseReadPromise.then(function() { 
 			kendo.ui.progress($('html'), false);
 			initFiltering();
+			initCharts();
 		});
 	}
 	
