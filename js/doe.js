@@ -23,12 +23,14 @@ var utils = {};
 	
 	var databaseReadPromise = database.read();
 
-	var dbRegistry = DOE.dbRegistry = [database];
-
+	var dsRegistry = DOE.dsRegistry = [database];
+	
 	function filterDatabase(field, event) {
 		var values = event.sender.value(),
 			newFilter = database.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field });
+		var log = _.debounce(function(value) { console.log('value', value); }, 6000);
+		console.log('filterDatabase', field);
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;	
 		} else {
@@ -36,14 +38,15 @@ var utils = {};
 				values = _.map(values, function(year) { return '01/01/' + year; });
 			}
 			filter.operator = function(value) {
+				//console.log('value', value);
+				log(value);
 				return values.indexOf(value) >= 0;
 			};			
 		}
-		/*
-		_.each(dbRegistry, function(db) {
-			db.filter(newFilter);			
+		_.each(dsRegistry, function(ds) {
+			console.log(ds);
+			ds.filter(newFilter);			
 		});
-		*/
 	}
 	
 	function initCharts(JSONData) {
@@ -75,8 +78,7 @@ var utils = {};
 				field : "prodYear",
 				dir : "asc"
 		}});
-		lineChartDatasource.read();
-		dbRegistry.push(lineChartDatasource);
+		dsRegistry.push(lineChartDatasource);
 		$("#data-visulizer").kendoChart({
 			title : {
 				text : "Wells Per State"
@@ -262,6 +264,8 @@ var utils = {};
 			kendo.ui.progress($('html'), false);
 			initFiltering(JSONData);
 			initCharts(JSONData);
+			// pull all the data in as soon as its available
+			_.each(dsRegistry, function(ds) { ds.read(); }); 
 		});
 	}
 	
