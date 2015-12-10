@@ -223,28 +223,33 @@ var utils = {};
 	
 	
 	function initPieChart(JSONData){
-		var pieChartDatasource = new kendo.data.DataSource({
+		var pieChartWellsDatasource = new kendo.data.DataSource({
 			data: JSONData,
 			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
 			group:{field: "rateClass",
 				aggregates: [{ field: "numOilWells", aggregate: "sum" },
-				{ field: "numGasWells", aggregate: "sum" }]
+				{ field: "numGasWells", aggregate: "sum" },
+					{ field: "oilWellsDayson", aggregate: "sum" },
+				{ field: "gasWellsDayson", aggregate: "sum" }]
 			}
 		});
-		pieChartDatasource.read();
-		
-		var oilSeries = [],
-		gasSeries = [],
-		items = pieChartDatasource.view(),
+		pieChartWellsDatasource.read();
+		var oilWellSeries = [],
+		gasWellSeries = [],
+		gasDaysOnSeries = [],
+		oilDaysOnSeries = [],
+		items = pieChartWellsDatasource.view(),
 		length = items.length,
 		item;
 		//create the chart series  
 		for (var i = 0; i < length; i++) {
 			item = items[i];
-			oilSeries.push({ category: item.value, value: item.aggregates.numOilWells.sum});
-			gasSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum})
+			oilWellSeries.push({ category: item.value, value: item.aggregates.numOilWells.sum});
+			gasWellSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum});
+			gasDaysOnSeries.push({ category: item.value, value: item.aggregates.oilWellsDayson.sum});
+			oilDaysOnSeries.push({ category: item.value, value: item.aggregates.gasWellsDayson.sum});
 		}
-		dsRegistry.push(pieChartDatasource);
+		dsRegistry.push(pieChartWellsDatasource);
 		
 		$("#wellsOilPieChart").kendoChart({
 			title : {
@@ -253,8 +258,8 @@ var utils = {};
 			seriesDefaults: {
 				type: "pie"
 			},
-			dataSource : pieChartDatasource,
-			series: [{data:oilSeries}],
+			dataSource : pieChartWellsDatasource,
+			series: [{data:oilWellSeries}],
 			tooltip: {
 				visible: true
 			}
@@ -269,8 +274,39 @@ var utils = {};
 			seriesDefaults: {
 				type: "pie"
 			},
-			dataSource : pieChartDatasource,
-			series: [{data:gasSeries}],
+			dataSource : pieChartWellsDatasource,
+			series: [{data:gasWellSeries}],
+			tooltip: {
+				visible: true
+			}
+			
+		});	
+		
+		$("#daysOnOilPieChart").kendoChart({
+			title : {
+				text : "Oil Days On per Rate Class"
+			},
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartWellsDatasource,
+			series: [{data:oilDaysOnSeries}],
+			tooltip: {
+				visible: true
+			}
+			
+		});	
+		
+		$("#daysOnGasPieChart").kendoChart({
+			title : {
+				text : "Gas Days On per Rate Class"
+			},
+			theme:"material",
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartWellsDatasource,
+			series: [{data:gasDaysOnSeries}],
 			tooltip: {
 				visible: true
 			}
