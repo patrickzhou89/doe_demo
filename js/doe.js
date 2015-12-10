@@ -61,6 +61,11 @@ var DOE = {};
 			{ field: RATE_CLASS, display: 'Rate Classes' }
 		];
 		var filtering = {
+			refreshFilters: function() {
+				$('#first-filter-select').data('kendoMultiSelect').refresh();
+				$('#second-filter-select').data('kendoMultiSelect').refresh();
+				$('#third-filter-select').data('kendoMultiSelect').refresh();
+			},
 			firstFilter: {
 				filterType: null,
 				display: true,
@@ -96,6 +101,7 @@ var DOE = {};
  					}
 					self.thirdFilter.set('display', false);
 					self.thirdFilter.set('dataSource', emptyDataSource);
+					self.refreshFilters();
 				},
 				dataSource: stateDataSource,
 				filter: null,
@@ -136,6 +142,7 @@ var DOE = {};
 						});
  					}
 					self.thirdFilter.set('dataSource', emptyDataSource);
+					self.refreshFilters();
 				},
 				filterType: null,
 				dataSource: [],
@@ -156,6 +163,7 @@ var DOE = {};
 						field = dataItem.field;
 					self.thirdFilter.set('filterType', field);
 					self.thirdFilter.set('dataSource', dataSourceMap[field]);
+					self.refreshFilters();
 				},
 				filterType: null,
 				dataSource: [],
