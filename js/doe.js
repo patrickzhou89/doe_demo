@@ -251,18 +251,9 @@ var utils = {};
 		$('#second-filter').hide();
 		$('#third-filter').hide();
 	}
-	function initExportModule(){
-		var exportModule = {
-			loadExportView: function(){
-				console.log('loading export view. . .');
-			}
-		};
-		kendo.bind($('#sidebar'), kendo.observable(exportModule));
-	}
 	
 	function init() {
 		kendo.ui.progress($('html'), true);
-		initExportModule();
 		databaseReadPromise.then(function() {
 			var JSONData = database.data().toJSON();
 			kendo.ui.progress($('html'), false);
