@@ -130,6 +130,7 @@ html,body{
     height:100%;
     position:absolute;
     right:0;
+    top:0;
     border-left:1px solid #e7e7e7;
     box-shadow: 0px 1px 4px #666;
 }
@@ -138,6 +139,24 @@ html,body{
     width:80%;
     position:static;
     margin:auto;
+}
+#table{
+    display:none;
+}
+#map{
+    display:none;
+}
+#barChart{
+    display:none;
+}
+#pieChart{
+    display:none;
+}
+#lineChart{
+    display:inline-block;
+    height: 600px;
+    width:100%;
+    margin: auto;
 }
 .filter-section {
     margin: 10px;
