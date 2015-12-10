@@ -60,6 +60,7 @@ var DOE = {};
 			{ field: PROD_YEAR, display: 'Years' }, 
 			{ field: RATE_CLASS, display: 'Rate Classes' }
 		];
+		var $secondFilter = $('#second-filter'), $thirdFilter = $('#third-filter');
 		var filtering = {
 			refreshFilters: function() {
 				$('#first-filter-select').data('kendoMultiSelect').refresh();
@@ -78,13 +79,15 @@ var DOE = {};
 					if (!field) {
 						self.firstFilter.set('filterType', null);
 						self.firstFilter.set('dataSource', emptyDataSource);
-						animationPromise = kendo.fx($('#second-filter')).expand('vertical').reverse();
+						if (!$secondFilter.is(':hidden')) {
+							kendo.fx($secondFilter).expand('vertical').reverse();							
+						}
 						self.secondFilter.set('dataSource', emptyDataSource);
 					} else {
 						self.firstFilter.set('filterType', field);
 						self.firstFilter.set('dataSource', dataSourceMap[field]);
-						if ($('#second-filter').is(':hidden')) {
-							kendo.fx($('#second-filter')).expand('vertical').play();							
+						if ($secondFilter.is(':hidden')) {
+							kendo.fx($secondFilter).expand('vertical').play();
 						}
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('dataSource', emptyDataSource);
@@ -97,8 +100,8 @@ var DOE = {};
 						});
  					}
 					console.log($('#third-filter'));
-					if (!$('#third-filter').is(':hidden')) {
-						kendo.fx($('#third-filter')).expand('vertical').reverse();
+					if (!$thirdFilter.is(':hidden')) {
+						kendo.fx($thirdFilter).expand('vertical').reverse();
 					}
 					self.thirdFilter.set('dataSource', emptyDataSource);
 					self.refreshFilters();
@@ -120,14 +123,14 @@ var DOE = {};
 					if (!field) {
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('dataSource', emptyDataSource);
-						if ($('#third-filter').is(':hidden')) {
-							kendo.fx($('#third-filter')).expand('vertical').reverse();							
+						if (!$thirdFilter.is(':hidden')) {
+							kendo.fx($thirdFilter).expand('vertical').reverse();							
 						}
 					} else {
 						self.secondFilter.set('filterType', field);
 						self.secondFilter.set('dataSource', dataSourceMap[field]);
-						if ($('#third-filter').is(':hidden')) {
-							kendo.fx($('#third-filter')).expand('vertical').play();							
+						if ($thirdFilter.is(':hidden')) {
+							kendo.fx($thirdFilter).expand('vertical').play();							
 						}
 						self.thirdFilter.filterTypeSource.filter({
 							field: 'field', 
@@ -171,8 +174,8 @@ var DOE = {};
 			}
 		};
 		kendo.bind($('#filters'), kendo.observable(filtering));
-		kendo.fx($('#second-filter')).expand('vertical').reverse();
-		kendo.fx($('#third-filter')).expand('vertical').reverse();
+		$('#second-filter').hide();
+		$('#third-filter').hide();
 	}
 	function initExportModule(){
 		var exportModule = {
