@@ -171,33 +171,52 @@ var utils = {};
 		var pieChartDatasource = new kendo.data.DataSource({
 			data: JSONData,
 			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
-			group:{field: "state",
-				aggregates: [{ field: "numOilWells", aggregate: "sum" }]
+			group:{field: "rateClass",
+				aggregates: [{ field: "numOilWells", aggregate: "sum" },
+				{ field: "numGasWells", aggregate: "sum" }]
 			}
 			
 			
 		});
 		pieChartDatasource.read();
 		
-		var series = [],
+		var oilSeries = [],
+		gasSeries = [],
 		items = pieChartDatasource.view(),
 		length = items.length,
 		item;
 		//create the chart series  
 		for (var i = 0; i < length; i++) {
 			item = items[i];
-			series.push({ category: item.value, value: item.aggregates.numOilWells.sum})
+			oilSeries.push({ category: item.value, value: item.aggregates.numOilWells.sum});
+			gasSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum})
 		}
 		dsRegistry.push(pieChartDatasource);
-		$("#pieChart").kendoChart({
+		
+		$("#wellsOilPieChart").kendoChart({
 			title : {
-				text : "Wells Per State"
+				text : "Oil Wells per Rate Class"
 			},
 			seriesDefaults: {
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
-			series: [{data:series}],
+			series: [{data:oilSeries}],
+			tooltip: {
+				visible: true
+			}
+			
+		});	
+		
+		$("#wellsGasPieChart").kendoChart({
+			title : {
+				text : "Gas Wells per Rate Class"
+			},
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartDatasource,
+			series: [{data:gasSeries}],
 			tooltip: {
 				visible: true
 			}
