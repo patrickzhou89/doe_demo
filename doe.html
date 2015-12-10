@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>DOE</title>
+	<title>U.S. Energy Information Information</title>
 	<link href="css/kendo.common.min.css" rel="stylesheet">
 	<link href="css/kendo.material.min.css" rel="stylesheet">
 	<link href="css/doe.css" rel="stylesheet">
@@ -25,7 +25,7 @@
 				<li data-bind="events:{click:loadExportView}"><img src='css/images/export-icon.png'/><span>Export Data</span></li>
 			</ul>
 		</div>
-		<div id="data-visulizer">
+		<div id="data-visualizer">
 			<div id="lineChart"></div>
 			<div id="pieChart"></div>
 			<div id="barChart"></div>
@@ -76,14 +76,12 @@
 			<input id='export-type' />
 		</div>
 		<div class='modal-row'>
-			<label for='filename'>File Name:</label>
-			<input id='filename' class='k-input k-text-box' type='text' placeholder='filename' />			
+			<label for='filename'>Filename:</label>
+			<input id='filename' class='k-input k-text-box' type='text' placeholder='Enter filename...' />			
 		</div>
-		<div class='modal-row'>
-			<div id='modal-actions'>
-				<button class='k-button' data-bind='events:{click:exportRawData}'>Export</button>
+		<div class='modal-row' id='modal-actions'>
+			<button class='k-button' data-bind='events:{click:exportRawData}'>Export</button>
 			<button class='k-button' data-bind='events:{click:cancelExport}'>Cancel</button>
-			</div>			
 		</div>
 	</div>
 	<script src="js/jquery-1.11.3.min.js"></script>

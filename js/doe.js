@@ -264,6 +264,42 @@ var utils = {};
 
 
 (function(){
+	var $modal = $('#modal').kendoWindow({
+        modal: true,
+        height: '180px',
+        width: '400px',
+        draggable: false,
+        pinned: true,
+        visible:false,
+        resizable: false,
+        activate: function() {
+            this.wrapper.find('input#export-type').kendoDropDownList({
+                dataSource: [{
+                    fileType: 'Spreadsheet (xlsx)',
+                    ext: 'excel'
+                }, {
+                    fileType: 'Spreadsheet (csv)',
+                    ext: 'excel_csv'
+                }, {
+                    fileType: 'PDF',
+                    ext: 'pdf'
+                }, {
+                    fileType: 'JSON',
+                    ext: 'json'
+                }, {
+                    fileType: 'XML',
+                    ext: 'xml'
+                }],
+                dataTextField: 'fileType',
+                dataValueField: 'ext',
+            });
+        },
+        close: function(){
+        	this.wrapper.find('#filename').val('');
+        }
+    }).data('kendoWindow');
+    $('#modal').siblings('.k-header').remove();
+
 	var header = {
 		toggleFiltering:function(){
 			$('#filter-bar').toggle('slide',{direction:'right'},200);
@@ -280,73 +316,22 @@ var utils = {};
 
     var sideBar = {
         loadMap: function() {
-            console.log('loading map. . .');
-			$("#map").css("display", "block");
-			$("#lineChart").css("display", "none");
-			$("#pieChart").css("display", "none");
-			$("#barChart").css("display", "none");
-			$("#table").css("display", "none");
+			$("#map").show();
+			$("#lineChart, #pieChart, #barChart, #table").hide();
         },
         loadPieChart: function() {
-            console.log('loading pie chart. . .');
-			$("#map").css("display", "none");
-			$("#lineChart").css("display", "none");
-			$("#pieChart").css("display", "block");
-			$("#barChart").css("display", "none");
-			$("#table").css("display", "none");
+			$("#pieChart").show();
+			$("#lineChart, #map, #barChart, #table").hide();
         },
         loadLineChart: function() {
-            console.log('loading line chart. . .');
-			$("#map").css("display", "none");
-			$("#lineChart").css("display", "block");
-			$("#pieChart").css("display", "none");
-			$("#barChart").css("display", "none");
-			$("#table").css("display", "none");
+        	$("#lineChart").show();
+			$("#pieChart, #map, #barChart, #table").hide();
         },
         loadBarGraph: function() {
-            console.log('loading bar graph. . .');
-			$("#map").css("display", "none");
-			$("#lineChart").css("display", "none");
-			$("#pieChart").css("display", "none");
-			$("#barChart").css("display", "block");
-			$("#table").css("display", "none");
+        	$("#barChart").show();
+			$("#pieChart, #map, #lineChart, #table").hide();
         },
         loadExportView: function() {
-            var $modal = $('#modal').kendoWindow({
-                modal: true,
-                height: '40%',
-                width: '30%',
-                draggable: false,
-                pinned: true,
-                resizable: false,
-                activate: function() {
-                    this.wrapper.find('div.k-header').hide();
-                    this.wrapper.find('input#export-type').kendoDropDownList({
-                        dataSource: [{
-                            fileType: 'Spreadsheet (xlsx)',
-                            ext: 'excel'
-                        }, {
-                            fileType: 'Spreadsheet (csv)',
-                            ext: 'excel_csv'
-                        }, {
-                            fileType: 'PDF',
-                            ext: 'pdf'
-                        }, {
-                            fileType: 'JSON',
-                            ext: 'json'
-                        }, {
-                            fileType: 'XML',
-                            ext: 'xml'
-                        }],
-                        dataTextField: 'fileType',
-                        dataValueField: 'ext',
-                    });
-                },
-                close: function(){
-                	//reset filename field
-                	this.wrapper.find('#filename').val('');
-                }
-            }).data('kendoWindow');
             $modal.open().center();
         }
     };
