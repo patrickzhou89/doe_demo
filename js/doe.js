@@ -597,14 +597,11 @@ var utils = {};
         element.click();
         document.body.removeChild(element);
     };
-    utils.validateFilename = function(filename){
-    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
-    	return regex.test(filename);
-    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
             	$filenameInput = $('#modal').find('#filename'), 
+            	$grid = $('#table').data('kendoGrid'),
                 userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
@@ -614,10 +611,6 @@ var utils = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
-                console.log(utils.validateFilename(saveFileName));
-                if(!utils.validateFilename(saveFileName)){
-                	saveFileName += '.' + fileType;
-                }
             switch (true) {
                 case fileType === exportType.JSON:
                     var gridJSON = DOE.database.view(); //filtered datasource
