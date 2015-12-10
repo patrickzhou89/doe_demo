@@ -8,6 +8,25 @@ var utils = {};
 	
 	var DOEData = null;
 	
+	/*
+	var database = DOE.database = new kendo.data.DataSource({
+		transport: {
+			read: 'data/states.json'
+		},
+		//schema: { model: DataModel },
+		filter: {
+			logic: 'and',
+			filters: [
+				{ field: STATE, operator: alwaysTrue },
+				{ field: PROD_YEAR, operator: alwaysTrue },
+				{ field: RATE_CLASS, operator: alwaysTrue }
+			]
+		}
+	});
+	
+	var databaseReadPromise = database.read();
+	*/
+	
 	var dsRegistry = DOE.dsRegistry = [];
 	
 	function filterDatabase(field, event) {
@@ -31,7 +50,7 @@ var utils = {};
 					}
 				}
 				return values.indexOf(value) >= 0;
-			};
+			};			
 		}
 		_.each(dsRegistry, function(ds) {
 			ds.filter(newFilter);			
@@ -39,26 +58,34 @@ var utils = {};
 	}
 	
 	function initCharts(JSONData) {
-		initLineChart(JSONData);
-		initPieChart(JSONData);	
-	}
-	
-	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
 			schema : {
 				model : {
 					fields : {
-						prodYear : {type : 'date'},
-						state : {type : 'string'},
-						rateClass : {type : 'number'},
-						numOilWells : {type : 'number'}	
+						prodYear : {
+							type : 'date'
+						},
+						state : {
+							type : 'string'
+						},
+						rateClass : {
+							type : 'number'
+						},
+						numOilWells : {
+							type : 'number'
+						}
+						
 					}
 				}
 			},
 			data: JSONData,
 			group : {
 				field : "state"
-			}});
+			},
+			sort : {
+				field : "prodYear",
+				dir : "asc"
+		}});
 		lineChartDatasource.read();
 		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
@@ -97,46 +124,7 @@ var utils = {};
 				visible : true,
 				template : "State: #= series.name #: #= value #"
 			}
-		});	
-	}
-	
-	
-	function initPieChart(JSONData){
-		var pieChartDatasource = new kendo.data.DataSource({
-			data: JSONData,
-			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
-			group:{field: "state",
-				aggregates: [{ field: "numOilWells", aggregate: "sum" }]
-			}
-			
-			
-		});
-		pieChartDatasource.read();
-		
-		var series = [],
-		items = pieChartDatasource.view(),
-		length = items.length,
-		item;
-		//create the chart series  
-		for (var i = 0; i < length; i++) {
-			item = items[i];
-			series.push({ category: item.value, value: item.aggregates.numOilWells.sum})
-		}
-		dsRegistry.push(pieChartDatasource);
-		$("#pieChart").kendoChart({
-			title : {
-				text : "Wells Per State"
-			},
-			seriesDefaults: {
-				type: "pie"
-			},
-			dataSource : pieChartDatasource,
-			series: [{data:series}],
-			tooltip: {
-				visible: true
-			}
-			
-		});	
+		});		
 	}
 	
 	function initFiltering(JSONData) {

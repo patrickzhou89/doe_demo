@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>U.S. Energy Information Information</title>
+	<title>U.S. Energy Information Administration</title>
 	<link href="css/kendo.common.min.css" rel="stylesheet">
 	<link href="css/kendo.material.min.css" rel="stylesheet">
 	<link href="css/doe.css" rel="stylesheet">
 	<link href="css/kendo.common.min.css" rel="stylesheet">
 	<link href="css/kendo.material.min.css" rel="stylesheet">
-
+	<link rel="icon" href="css/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
 	<div id='header'>
+		<div id='eia-logo-wrapper'>
+			<img id='eia-logo' src='css/images/eia-logo.png'/>
+			<span id='eia-text'>
+				U.S. Energy Information<br/> Administration
+			</span>
+		</div>
 		<div id='menu-wrapper'>
-			<img id='filter-button' data-bind='click:toggleFiltering'src='css/images/menu-icon.png'/>
+			<img id='filter-button' data-bind='click:toggleFiltering' src='css/images/menu-icon.png'/>
 		</div>
 	</div>
 	<div id='content'>
@@ -22,6 +28,7 @@
 				<li data-bind="events:{click:loadPieChart}"><img src='css/images/pie-chart-icon.png'/><span>Pie Chart</span></li>
 				<li data-bind="events:{click:loadLineChart}"><img src='css/images/line-graph-icon.png'/><span>Line Graph</span></li>
 				<li data-bind="events:{click:loadBarGraph}"><img src='css/images/bar-graph-icon.png'/><span>Bar Graph</span></li>
+				<li data-bind="events:{click:loadTable}"><img src='css/images/table-icon.png'/><span>Table</span></li>
 				<li data-bind="events:{click:loadExportView}"><img src='css/images/export-icon.png'/><span>Export Data</span></li>
 			</ul>
 		</div>
