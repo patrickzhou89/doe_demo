@@ -74,7 +74,7 @@ var utils = {};
 				dir : "asc"
 		}});
 		lineChartDatasource.read();
-		dbRegistry.push(lineChartDatasource);
+		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
 			title : {
 				text : "Wells Per State"
