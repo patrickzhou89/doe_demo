@@ -76,12 +76,22 @@ html, body {
 #sidebar {
   background-color: black;
   opacity: .8;
-  width: 50px;
+  width: 60px;
   height: 100%;
   position: absolute;
   left: 0;
   box-shadow: 2px 0px 5px #666;
   margin: -1px 0 0 0; }
+  #sidebar ul li {
+    text-align: center;
+    height: 59px;
+    border-bottom: 1px solid #666;
+    cursor: pointer; }
+    #sidebar ul li img {
+      margin-top: 5px; }
+    #sidebar ul li:hover {
+      opacity: .7;
+      background: #343434; }
 
 #filter-bar {
   background-color: #F5F7F8;
