@@ -68,8 +68,6 @@ var DOE = {};
 			},
 			firstFilter: {
 				filterType: null,
-				display: true,
-				disabled: false,
 				filterTypeSource: new kendo.data.DataSource({
 					data: filterTypes
 				}),
@@ -80,14 +78,13 @@ var DOE = {};
 					if (!field) {
 						self.firstFilter.set('filterType', null);
 						self.firstFilter.set('dataSource', emptyDataSource);
-						self.secondFilter.set('display', false);
+						animationPromise = kendo.fx($('#second-filter')).expand('vertical').reverse();
 						self.secondFilter.set('dataSource', emptyDataSource);
 					} else {
 						self.firstFilter.set('filterType', field);
 						self.firstFilter.set('dataSource', dataSourceMap[field]);
-						if (!self.secondFilter.display) {
-							kendo.fx($('#second-filter')).slideIn('down').play();
-							self.secondFilter.set('display', true);							
+						if ($('#second-filter').is(':hidden')) {
+							kendo.fx($('#second-filter')).expand('vertical').play();							
 						}
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('dataSource', emptyDataSource);
@@ -99,7 +96,10 @@ var DOE = {};
 							}
 						});
  					}
-					self.thirdFilter.set('display', false);
+					console.log($('#third-filter'));
+					if (!$('#third-filter').is(':hidden')) {
+						kendo.fx($('#third-filter')).expand('vertical').reverse();
+					}
 					self.thirdFilter.set('dataSource', emptyDataSource);
 					self.refreshFilters();
 				},
@@ -110,8 +110,6 @@ var DOE = {};
 				}
 			},
 			secondFilter: {
-				display: false,
-				disabled: false,
 				filterTypeSource: new kendo.data.DataSource({
 					data: filterTypes
 				}),
@@ -122,13 +120,14 @@ var DOE = {};
 					if (!field) {
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('dataSource', emptyDataSource);
-						self.thirdFilter.set('display', false);
+						if ($('#third-filter').is(':hidden')) {
+							kendo.fx($('#third-filter')).expand('vertical').reverse();							
+						}
 					} else {
 						self.secondFilter.set('filterType', field);
 						self.secondFilter.set('dataSource', dataSourceMap[field]);
-						if (!self.thirdFilter.display) {
-							kendo.fx($('#third-filter')).slideIn('down').play();
-							self.thirdFilter.set('display', true);							
+						if ($('#third-filter').is(':hidden')) {
+							kendo.fx($('#third-filter')).expand('vertical').play();							
 						}
 						self.thirdFilter.filterTypeSource.filter({
 							field: 'field', 
@@ -152,8 +151,6 @@ var DOE = {};
 				}
 			},
 			thirdFilter: {
-				display: false,
-				disabled: false,
 				filterTypeSource: new kendo.data.DataSource({
 					data: filterTypes
 				}),
@@ -174,6 +171,8 @@ var DOE = {};
 			}
 		};
 		kendo.bind($('#filters'), kendo.observable(filtering));
+		kendo.fx($('#second-filter')).expand('vertical').reverse();
+		kendo.fx($('#third-filter')).expand('vertical').reverse();
 	}
 	
 	function init() {

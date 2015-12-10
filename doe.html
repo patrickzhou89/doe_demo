@@ -39,29 +39,29 @@
 						data-value-field="field"
 						data-text-field="display"
 						data-option-label="Select a filter..."
-						data-bind="value: firstFilter.filterType, source: firstFilter.filterTypeSource, disabled: firstFilter.disabled, events: { select: firstFilter.filterTypeSelect } ">
+						data-bind="value: firstFilter.filterType, source: firstFilter.filterTypeSource, events: { select: firstFilter.filterTypeSelect } ">
 					<div id="first-filter-select" data-role="multiselect"
 						data-bind="value: firstFilter.filter, source: firstFilter.dataSource, events: { change: firstFilter.filterChange }">
 					</div>
 				</div>
-				<div id="second-filter" class="filter-section" data-bind="visible: secondFilter.display">
+				<div id="second-filter" class="filter-section">
 					<input id="second-filter-type" data-role="dropdownlist"
 						data-value-primitive="true"
 						data-value-field="field"
 						data-text-field="display"
 						data-option-label="Select a filter..."
-						data-bind="value: secondFilter.filterType, source: secondFilter.filterTypeSource, disabled: secondFilter.disabled, events: { select: secondFilter.filterTypeSelect } ">
+						data-bind="value: secondFilter.filterType, source: secondFilter.filterTypeSource, events: { select: secondFilter.filterTypeSelect } ">
 					<div id="second-filter-select" data-role="multiselect"
 						data-bind="value: secondFilter.filter, source: secondFilter.dataSource, events: { change: secondFilter.filterChange }">
 					</div>
 				</div>
-				<div id="third-filter" class="filter-section" data-bind="visible: thirdFilter.display">
+				<div id="third-filter" class="filter-section" >
 					<input id="third-filter-type" data-role="dropdownlist"
 						data-value-primitive="true"
 						data-value-field="field"
 						data-text-field="display"
 						data-option-label="Select a filter..."
-						data-bind="value: thirdFilter.filterType, source: thirdFilter.filterTypeSource, disabled: thirdFilter.disabled, events: { select: thirdFilter.filterTypeSelect } ">
+						data-bind="value: thirdFilter.filterType, source: thirdFilter.filterTypeSource, events: { select: thirdFilter.filterTypeSelect } ">
 					<div id="third-filter-select" data-role="multiselect"
 						data-bind="value: thirdFilter.filter, source: thirdFilter.dataSource, events: { change: thirdFilter.filterChange }">
 					</div>
