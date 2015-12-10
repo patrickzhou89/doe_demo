@@ -12,6 +12,7 @@ var utils = {};
 	var alwaysTrue = _.constant(true);
 	
 	var DOEData = null;
+	var DOEStateMap = null;
 	
 	var rateClasses = _.range(1, 23); // 1 to 23 exclusive
 	
@@ -46,27 +47,6 @@ var utils = {};
 	}
 	
 	function initCharts(JSONData) {
-		/*
-		JSONData = _.map(JSONData, function(item) {
-			return {
-				state: item.state,
-				prodYear: item.prodYear,
-				rateClass: item.rateClass,
-				daysOn: item.gasWellsDayson,
-				numWells: item.numGasWells,
-				type: GAS
-			};
-		}).concat(_.map(JSONData, function(item) {
-			return {
-				state: item.state,
-				prodYear: item.prodYear,
-				rateClass: item.rateClass,
-				daysOn: item.oilWellsDayson,
-				numWells: item.numOilWells,
-				type: OIL
-			};
-		}));
-		*/
 		var barChartDataSource = new kendo.data.DataSource({
 			data: JSONData,
 			group: { 
@@ -78,13 +58,6 @@ var utils = {};
 			}
 		});
 		barChartDataSource.read();
-		console.log(_.map(barChartDataSource.view(), function(item) {
-				return {
-					rateClass: item.value,
-					numGasWells: item.aggregates.numGasWells.sum,
-					numOilWells: item.aggregates.numOilWells.sum
-				};
-			}));
 		var barChart = $("#barChart").kendoChart({
 			theme: THEME,
 			dataSource: _.map(barChartDataSource.view(), function(item) {
@@ -104,39 +77,128 @@ var utils = {};
 			}],
 			categoryAxis: {
 				field: 'rateClass'
-				//categories: rateClasses
 			}
 		});
-		return;
+		initLineChart(JSONData);
+		initPieChart(JSONData);	
+		initTable(JSONData);
+	}
+	function initMaps(JSONdata){
+		$('#map').kendoMap({
+    	center: [39.5, -120],
+        zoom: 4,
+        minSize: 300,
+        controls:{
+          	attribution: false,
+           	navigator: false,
+           	zoom: false
+        },
+        zoomable: false,
+        layers: [{
+            type: "shape",
+              	dataSource: {
+           	    type: "geojson",
+               	transport: {
+                	read: "data/us.geo.json"
+               	}
+           	},
+            style: {
+                fill: {
+                    opacity: 0.7,
+                    color: 'blue'
+                }
+            }
+        }],
+        shapeCreated: function(e){
+          	var shape = e.shape,
+           		createdState = shape.dataItem.properties.name,
+           		filteredData = DOEData,
+           		oilSumTotal = 0,
+           		gasSumTotal = 0,
+           		stateGasTotal = 0,
+           		stateOilTotal = 0;
+           		stateData = $.map(filteredData, function(n, i){
+           			oilSumTotal += n.numOilWells;
+           			gasSumTotal += n.numGasWells;
+           			if(DOEStateMap[n.state] === createdState){
+           				stateOilTotal += n.numOilWells;
+           				stateGasTotal += n.numGasWells;             				
+           				return n;
+           			}
+           		});
+            		// console.log('stateOilTotal:', stateOilTotal);
+            		// console.log('stateGasTotal:', stateGasTotal);
+            		// console.log('oilSumTotal:', oilSumTotal);
+            		// console.log('gasSumTotal:', gasSumTotal); 
+            		// console.log('% gas usage by state ' + createdState +':', (stateGasTotal / gasSumTotal) * 100);
+            		// console.log('% oil usage by state ' + createdState +':', (stateOilTotal / oilSumTotal) * 100);     		
+            		// console.log('shape:', shape);
+       		shape.options.fill.opacity = (stateOilTotal / oilSumTotal) * 100;
+            }
+         });				
+	}
+	
+	function initTable(JSONData){
+		$("#table").kendoGrid({
+			dataSource: {
+				data: JSONData,
+				schema: {
+					model: {
+						fields: {
+							state: { type: "string" },
+							prodYear: { type: "date" },
+							rateClass: { type: "number" },
+							numOilWells: { type: "number" },
+							oilProdBBL: { type: "number" },
+							oilWellsDayson: { type: "number" },
+							numGasWells: { type: "number" },
+							condenProdBBL: { type: "number" },
+							gasWellsDayson: { type: "number" }
+						}
+					}
+				},
+				pageSize: 22
+			},
+			height: 600,
+			scrollable: true,
+			sortable: true,
+			filterable: true,
+			pageable: {
+				input: true,
+				numeric: false
+			},
+			columns: [
+				{ field: "state", title: "State" },
+				{ field: "prodYear", title: "Production Year", format:"{0:yyyy}" },
+				{ field: "rateClass", title: "Rate Class"},
+				{ field: "numOilWells", title: "# of Oil Wells" },
+				{ field: "oilProdBBL", title: "Barrels of Oil Produced" },
+				{ field: "oilWellsDayson", title: "# of Days Oil Wells On" },
+				{ field: "numGasWells", title: "# of Gas Wells"},
+				{ field: "condenProdBBL", title: "condenProdBBL" },
+				{ field: "gasWellsDayson", title: "# of Days Gas Wells On" }
+			]
+		});
 		
+		
+	}
+	
+	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
 			schema : {
 				model : {
 					fields : {
-						prodYear : {
-							type : 'date'
-						},
-						state : {
-							type : 'string'
-						},
-						rateClass : {
-							type : 'number'
-						},
-						numOilWells : {
-							type : 'number'
-						}
-						
+						prodYear : {type : 'date'},
+						state : {type : 'string'},
+						rateClass : {type : 'number'},
+						numOilWells : {type : 'number'}	
 					}
 				}
 			},
 			data: JSONData,
 			group : {
 				field : "state"
-			},
-			sort : {
-				field : "prodYear",
-				dir : "asc"
-		}});
+			}});
 		lineChartDatasource.read();
 		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
@@ -144,6 +206,7 @@ var utils = {};
 			title : {
 				text : "Wells Per State"
 			},
+			theme:"material",
 			dataSource : lineChartDatasource,
 			series : [ {
 				type : "line",
@@ -176,7 +239,64 @@ var utils = {};
 				visible : true,
 				template : "State: #= series.name #: #= value #"
 			}
-		});		
+		});	
+	}
+	
+	
+	function initPieChart(JSONData){
+		var pieChartDatasource = new kendo.data.DataSource({
+			data: JSONData,
+			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
+			group:{field: "rateClass",
+				aggregates: [{ field: "numOilWells", aggregate: "sum" },
+				{ field: "numGasWells", aggregate: "sum" }]
+			}
+		});
+		pieChartDatasource.read();
+		
+		var oilSeries = [],
+		gasSeries = [],
+		items = pieChartDatasource.view(),
+		length = items.length,
+		item;
+		//create the chart series  
+		for (var i = 0; i < length; i++) {
+			item = items[i];
+			oilSeries.push({ category: item.value, value: item.aggregates.numOilWells.sum});
+			gasSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum})
+		}
+		dsRegistry.push(pieChartDatasource);
+		
+		$("#wellsOilPieChart").kendoChart({
+			title : {
+				text : "Oil Wells per Rate Class"
+			},
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartDatasource,
+			series: [{data:oilSeries}],
+			tooltip: {
+				visible: true
+			}
+			
+		});	
+		
+		$("#wellsGasPieChart").kendoChart({
+			title : {
+				text : "Gas Wells per Rate Class"
+			},
+			theme:"material",
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartDatasource,
+			series: [{data:gasSeries}],
+			tooltip: {
+				visible: true
+			}
+			
+		});	
 	}
 	
 	function initFiltering(JSONData) {
@@ -325,8 +445,12 @@ var utils = {};
 				kendo.ui.progress($('html'), false);
 				initFiltering(DOEData);
 				initCharts(DOEData);
-				console.log('test');			
+				initMaps(DOEData);					
 			});
+		$.get('data/states_hash.json', {}, 
+			function(result) {
+				DOEStateMap = result;				
+			});		
 	}
 	
 	$(init);
@@ -366,7 +490,7 @@ var utils = {};
             });
         },
         close: function(){
-        	this.wrapper.find('#filename').val('');
+        	//this.wrapper.find('#filename').val('');
         }
     }).data('kendoWindow');
     $('#modal').siblings('.k-header').remove();
@@ -387,8 +511,14 @@ var utils = {};
 
     var sideBar = {
         loadMap: function() {
-			$("#map").show();
+        	var $map = $("#map"),
+        		mapData = $map.data('kendoMap'),
+        		$dataVizContaienr = $('#data-visulizer');
+
 			$("#lineChart, #pieChart, #barChart, #table").hide();
+			$map.css({display: 'block', width:$dataVizContaienr.outerWidth()});
+			mapData.resize(); //force redraw to fit to container
+			mapData.scroller.enabled = false; //disable scrolling
         },
         loadPieChart: function() {
 			$("#pieChart").show();
@@ -402,7 +532,47 @@ var utils = {};
         	$("#barChart").show();
 			$("#pieChart, #map, #lineChart, #table").hide();
         },
+		loadTable: function() {
+        	$("#table").show();
+			$("#pieChart, #map, #lineChart, #barChart").hide();
+        },
         loadExportView: function() {
+            var $modal = $('#modal').kendoWindow({
+                modal: true,
+                height: '40%',
+                width: '30%',
+                draggable: false,
+                pinned: true,
+                resizable: false,
+                activate: function() {
+                    this.wrapper.find('div.k-header').hide();
+                    this.wrapper.find('input#export-type').kendoDropDownList({
+                        dataSource: [{
+                            fileType: 'Spreadsheet (xlsx)',
+                            ext: 'excel'
+                        }, {
+                            fileType: 'Spreadsheet (csv)',
+                            ext: 'excel_csv'
+                        }, {
+                            fileType: 'PDF',
+                            ext: 'pdf'
+                        }, {
+                            fileType: 'JSON',
+                            ext: 'json'
+                        }, {
+                            fileType: 'XML',
+                            ext: 'xml'
+                        }],
+                        dataTextField: 'fileType',
+                        dataValueField: 'ext',
+                    });
+                },
+                close: function(){
+                	//reset filename field
+                	console.log(this.wrapper)
+                	this.wrapper.find('#filename').val('');
+                }
+            }).data('kendoWindow');
             $modal.open().center();
         }
     };
@@ -490,8 +660,8 @@ var utils = {};
             };
         },
         cancelExport: function() {
-            var modalWindow = $('#modal').data('kendoWindow');
-            modalWindow.close();
+        	//console.log('jdad');
+            $('#modal').data('kendoWindow').close();
         }
     };
     kendo.bind($('#modal'), kendo.observable(modalEvents));
