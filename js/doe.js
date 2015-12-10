@@ -8,8 +8,9 @@ var utils = {};
 	
 	var database = new kendo.data.DataSource({
 		transport: {
-			read: 'data/statesNewer.json'
+			read: 'data/states.json'
 		},
+		//schema: { model: DataModel },
 		filter: {
 			logic: 'and',
 			filters: [
@@ -38,7 +39,7 @@ var utils = {};
 		database.filter(newFilter);
 	}
 	
-	function initCharts(){
+	function initCharts(JSONData) {
 		var lineChartDatasource = 	new kendo.data.DataSource({
 			schema : {
 				model : {
@@ -59,10 +60,7 @@ var utils = {};
 					}
 				}
 			},
-			transport: {
-				read: 'data/statesNewer.json',
-				dataType:"json"
-			},
+			data: JSONData,
 			group : {
 				field : "state"
 			},
@@ -107,14 +105,10 @@ var utils = {};
 				visible : true,
 				template : "State: #= series.name #: #= value #"
 			}
-		});
-			
-			
-			
+		});		
 	}
 	
-	function initFiltering() {
-		var JSONData = database.data().toJSON();
+	function initFiltering(JSONData) {
 		var stateDataSource = new kendo.data.DataSource({
 			data: _.chain(JSONData).pluck(STATE).uniq().value()
 		});
@@ -125,11 +119,11 @@ var utils = {};
 		var rateClassDataSource = new kendo.data.DataSource({
 			data: _.range(1, 27)
 		});
+		var emptyDataSource = new kendo.data.DataSource({ data: [] });
 		var dataSourceMap = {};
 		dataSourceMap[STATE] = stateDataSource;
 		dataSourceMap[PROD_YEAR] = yearDataSource;
 		dataSourceMap[RATE_CLASS] = rateClassDataSource;
-		var emptyDataSource = new kendo.data.DataSource({ data: [] });
 		var filterTypes = [
 			{ field: STATE, display: 'States' }, 
 			{ field: PROD_YEAR, display: 'Years' }, 
@@ -174,7 +168,6 @@ var utils = {};
 							}
 						});
  					}
-					console.log($('#third-filter'));
 					if (!$thirdFilter.is(':hidden')) {
 						kendo.fx($thirdFilter).expand('vertical').reverse();
 					}
@@ -255,10 +248,11 @@ var utils = {};
 	
 	function init() {
 		kendo.ui.progress($('html'), true);
-		databaseReadPromise.then(function() { 
+		databaseReadPromise.then(function() {
+			var JSONData = database.data().toJSON();
 			kendo.ui.progress($('html'), false);
-			initFiltering();
-			initCharts();
+			initFiltering(JSONData);
+			initCharts(JSONData);
 		});
 	}
 	
