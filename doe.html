@@ -5,40 +5,67 @@
 	<link href="css/kendo.common.min.css" rel="stylesheet">
 	<link href="css/kendo.material.min.css" rel="stylesheet">
 	<link href="css/doe.css" rel="stylesheet">
+	<link href="css/kendo.common.min.css" rel="stylesheet">
+	<link href="css/kendo.material.min.css" rel="stylesheet">
+
 </head>
 <body>
-	<div id="filters">
-		<div id="first-filter" class="filter-section">
-			<input id="first-filter-type" data-role="dropdownlist"
-				data-value-primitive="true"
-				data-value-field="field"
-				data-text-field="display"
-				data-option-label="Select a filter type..."
-				data-bind="value: firstFilter.filterType, source: firstFilter.filterTypeSource, disabled: firstFilter.disabled, events: { select: firstFilter.filterTypeSelect } ">
-			<div id="state-filter" data-role="multiselect"
-				data-bind="value: firstFilter.filter, source: firstFilter.dataSource, events: { change: firstFilter.filterChange }">
-			</div>
+	<div id='header'></div>
+	<div id='content'>
+		<div id='sidebar'>
+			<ul>
+				<li>US MAP</li>
+				<li><img src='css/images/pie-chart-icon.png'/></li>
+				<li>Line Graph</li>
+				<li>Bar Graph</li>
+				<li>
+					Export
+					<ul>
+						<li>JSON</li>
+						<li>XML</li>
+						<li>CSV</li>
+					</ul>
+				</li>
+			</ul>
 		</div>
-		<div id="second-filter" class="filter-section" data-bind="visible: secondFilter.display">
-			<input id="second-filter-type" data-role="dropdownlist"
-				data-value-primitive="true"
-				data-value-field="field"
-				data-text-field="display"
-				data-option-label="Select a filter type..."
-				data-bind="value: secondFilter.filterType, source: secondFilter.filterTypeSource, disabled: secondFilter.disabled, events: { select: secondFilter.filterTypeSelect } ">
-			<div id="year-filter" data-role="multiselect"
-				data-bind="value: secondFilter.filter, source: secondFilter.dataSource, events: { change: secondFilter.filterChange }">
-			</div>
+		<div id="map">
+			
 		</div>
-		<div id="third-filter" class="filter-section" data-bind="visible: thirdFilter.display">
-			<input id="third-filter-type" data-role="dropdownlist"
-				data-value-primitive="true"
-				data-value-field="field"
-				data-text-field="display"
-				data-option-label="Select a filter type..."
-				data-bind="value: thirdFilter.filterType, source: thirdFilter.filterTypeSource, disabled: thirdFilter.disabled, events: { select: thirdFilter.filterTypeSelect } ">
-			<div id="rate-class-filter" data-role="multiselect"
-				data-bind="value: thirdFilter.filter, source: thirdFilter.dataSource, events: { change: thirdFilter.filterChange }">
+		<div id='filter-bar'>
+			<div id="filters">
+				<div id="first-filter" class="filter-section">
+					<input id="first-filter-type" data-role="dropdownlist"
+						data-value-primitive="true"
+						data-value-field="field"
+						data-text-field="display"
+						data-option-label="Select a filter type..."
+						data-bind="value: firstFilter.filterType, source: firstFilter.filterTypeSource, disabled: firstFilter.disabled, events: { select: firstFilter.filterTypeSelect } ">
+					<div id="state-filter" data-role="multiselect"
+						data-bind="value: firstFilter.filter, source: firstFilter.dataSource, events: { change: firstFilter.filterChange }">
+					</div>
+				</div>
+				<div id="second-filter" class="filter-section" data-bind="visible: secondFilter.display">
+					<input id="second-filter-type" data-role="dropdownlist"
+						data-value-primitive="true"
+						data-value-field="field"
+						data-text-field="display"
+						data-option-label="Select a filter type..."
+						data-bind="value: secondFilter.filterType, source: secondFilter.filterTypeSource, disabled: secondFilter.disabled, events: { select: secondFilter.filterTypeSelect } ">
+					<div id="year-filter" data-role="multiselect"
+						data-bind="value: secondFilter.filter, source: secondFilter.dataSource, events: { change: secondFilter.filterChange }">
+					</div>
+				</div>
+				<div id="third-filter" class="filter-section" data-bind="visible: thirdFilter.display">
+					<input id="third-filter-type" data-role="dropdownlist"
+						data-value-primitive="true"
+						data-value-field="field"
+						data-text-field="display"
+						data-option-label="Select a filter type..."
+						data-bind="value: thirdFilter.filterType, source: thirdFilter.filterTypeSource, disabled: thirdFilter.disabled, events: { select: thirdFilter.filterTypeSelect } ">
+					<div id="rate-class-filter" data-role="multiselect"
+						data-bind="value: thirdFilter.filter, source: thirdFilter.dataSource, events: { change: thirdFilter.filterChange }">
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -46,5 +73,6 @@
 	<script src="js/kendo.all.min.js"></script>
 	<script src="js/lodash.min.js"></script>
 	<script src="js/doe.js"></script>
+	<script src="js/kendo.material.js"></script>
 </body>
 </html>
