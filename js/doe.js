@@ -2,7 +2,7 @@ var DOE = {};
 
 (function() {
 	
-	var STATE = 'state', PROD_YEAR = 'prod_year', RATE_CLASS = 'rate_class';
+	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
 	
 	var alwaysTrue = _.constant(true);
 	
