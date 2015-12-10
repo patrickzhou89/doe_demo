@@ -103,7 +103,7 @@ var DOE = {};
 					self.thirdFilter.set('dataSource', emptyDataSource);
 					self.refreshFilters();
 				},
-				dataSource: stateDataSource,
+				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
 					filterDatabase(this.firstFilter.filterType, event);
@@ -144,7 +144,7 @@ var DOE = {};
 					self.refreshFilters();
 				},
 				filterType: null,
-				dataSource: [],
+				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
 					filterDatabase(this.secondFilter.filterType, event);
@@ -163,7 +163,7 @@ var DOE = {};
 					self.refreshFilters();
 				},
 				filterType: null,
-				dataSource: [],
+				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
 					filterDatabase(this.thirdFilter.filterType, event);
