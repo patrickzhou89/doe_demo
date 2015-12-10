@@ -137,3 +137,7 @@ html, body {
 #data-visulizer{
 		height: 600px;
 }
+
+.modal-row{
+	padding-bottom:2%;
+}
