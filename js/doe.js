@@ -6,7 +6,7 @@ var utils = {};
 	
 	var alwaysTrue = _.constant(true);
 	
-	var database = new kendo.data.DataSource({
+	var database = DOE.database = new kendo.data.DataSource({
 		transport: {
 			read: 'data/states.json'
 		},
@@ -22,8 +22,8 @@ var utils = {};
 	});
 	
 	var databaseReadPromise = database.read();
-	
-	DOE.database = database;
+
+	var dbRegistry = DOE.dbRegistry = [database];
 
 	function filterDatabase(field, event) {
 		var values = event.sender.value(),
@@ -32,15 +32,20 @@ var utils = {};
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;	
 		} else {
+			if (field === PROD_YEAR) {
+				values = _.map(values, function(year) { return '01/01/' + year; });
+			}
 			filter.operator = function(value) {
-				return values.length === 0 || values.indexOf(value) >= 0;
+				return values.indexOf(value) >= 0;
 			};			
 		}
-		database.filter(newFilter);
+		_.each(dbRegistry, function(db) {
+			db.filter(newFilter);			
+		});
 	}
 	
 	function initCharts(JSONData) {
-		var lineChartDatasource = 	new kendo.data.DataSource({
+		var lineChartDatasource = new kendo.data.DataSource({
 			schema : {
 				model : {
 					fields : {
@@ -68,7 +73,7 @@ var utils = {};
 				field : "prodYear",
 				dir : "asc"
 		}});
-		
+		dbRegistry.push(lineChartDatasource);
 		$("#data-visulizer").kendoChart({
 			title : {
 				text : "Wells Per State"
@@ -113,7 +118,8 @@ var utils = {};
 			data: _.chain(JSONData).pluck(STATE).uniq().value()
 		});
 		var yearDataSource = new kendo.data.DataSource({
-			data: _.chain(JSONData).pluck(PROD_YEAR).uniq().value(),
+			data: _.chain(JSONData).pluck(PROD_YEAR).uniq()
+				.map(function(item) { return item.substring(6); }).value(),
 			sort: { dir: 'asc' }
 		});
 		var rateClassDataSource = new kendo.data.DataSource({
@@ -255,7 +261,6 @@ var utils = {};
 	}
 	
 	function init() {
-
 		kendo.ui.progress($('html'), true);
 		initExportModule();
 		databaseReadPromise.then(function() {
