@@ -1,0 +1,25 @@
+#filters {
+	position: relative;
+}
+
+.filter-section {
+	position: absolute;
+}
+
+#first-filter, #second-filter, #third-filter {
+	top: 0;
+	left: 0;
+	z-index: 30;
+}
+
+#second-filter {
+	top: 80px;
+	left: 0;
+	z-index: 20;
+}
+
+ #third-filter {
+	top: 160px;
+	left: 0;
+	z-index: 10;
+}
