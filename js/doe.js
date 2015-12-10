@@ -6,6 +6,9 @@ var utils = {};
 	
 	var alwaysTrue = _.constant(true);
 	
+	var DOEData = null;
+	
+	/*
 	var database = DOE.database = new kendo.data.DataSource({
 		transport: {
 			read: 'data/states.json'
@@ -22,16 +25,18 @@ var utils = {};
 	});
 	
 	var databaseReadPromise = database.read();
-
-	var dsRegistry = DOE.dsRegistry = [database];
+	*/
+	
+	var dsRegistry = DOE.dsRegistry = [];
 	
 	function filterDatabase(field, event) {
+		return; // TODO: fix this
 		var values = event.sender.value(),
 			newFilter = database.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
 			isProdYear = field === PROD_YEAR;
 		if (values.length === 0) {
-			filter.operator = alwaysTrue;	
+			filter.operator = alwaysTrue;
 		} else {
 			if (isProdYear) {
 				values = _.map(values, function(year) { return new Date('01/01/' + year).getTime(); });
@@ -128,8 +133,7 @@ var utils = {};
 		});
 		var yearDataSource = new kendo.data.DataSource({
 			data: _.chain(JSONData).pluck(PROD_YEAR).uniq()
-				.map(function(item) { return item.substring(6); }).value(),
-			sort: { dir: 'asc' }
+				.map(function(item) { return item.substring(6); }).value()
 		});
 		var rateClassDataSource = new kendo.data.DataSource({
 			data: _.range(1, 27)
@@ -263,12 +267,13 @@ var utils = {};
 	
 	function init() {
 		kendo.ui.progress($('html'), true);
-		databaseReadPromise.then(function() {
-			var JSONData = database.data().toJSON();
-			kendo.ui.progress($('html'), false);
-			initFiltering(JSONData);
-			initCharts(JSONData);
-		});
+		$.get('data/states.json', {}, 
+			function(result) {
+				DOE.data = DOEData = result;
+				kendo.ui.progress($('html'), false);
+				initFiltering(DOEData);
+				initCharts(DOEData);					
+			});
 	}
 	
 	$(init);
