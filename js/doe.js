@@ -8,25 +8,6 @@ var utils = {};
 	
 	var DOEData = null;
 	
-	/*
-	var database = DOE.database = new kendo.data.DataSource({
-		transport: {
-			read: 'data/states.json'
-		},
-		//schema: { model: DataModel },
-		filter: {
-			logic: 'and',
-			filters: [
-				{ field: STATE, operator: alwaysTrue },
-				{ field: PROD_YEAR, operator: alwaysTrue },
-				{ field: RATE_CLASS, operator: alwaysTrue }
-			]
-		}
-	});
-	
-	var databaseReadPromise = database.read();
-	*/
-	
 	var dsRegistry = DOE.dsRegistry = [];
 	
 	function filterDatabase(field, event) {
@@ -50,7 +31,7 @@ var utils = {};
 					}
 				}
 				return values.indexOf(value) >= 0;
-			};			
+			};
 		}
 		_.each(dsRegistry, function(ds) {
 			ds.filter(newFilter);			
@@ -79,6 +60,7 @@ var utils = {};
 				}
 			},
 			data: JSONData,
+			aggregate: { field: '', aggregate: 'sum' }, 
 			group : {
 				field : "state"
 			},
