@@ -23,8 +23,8 @@ var utils = {};
 	
 	var databaseReadPromise = database.read();
 
-	var dbRegistry = DOE.dbRegistry = [database];
-
+	var dsRegistry = DOE.dsRegistry = [database];
+	
 	function filterDatabase(field, event) {
 		var values = event.sender.value(),
 			newFilter = database.filter();
@@ -39,11 +39,9 @@ var utils = {};
 				return values.indexOf(value) >= 0;
 			};			
 		}
-		/*
-		_.each(dbRegistry, function(db) {
-			db.filter(newFilter);			
+		_.each(dsRegistry, function(ds) {
+			ds.filter(newFilter);			
 		});
-		*/
 	}
 	
 	function initCharts(JSONData) {
@@ -76,8 +74,8 @@ var utils = {};
 				dir : "asc"
 		}});
 		lineChartDatasource.read();
-		dbRegistry.push(lineChartDatasource);
-		$("#data-visulizer").kendoChart({
+		dsRegistry.push(lineChartDatasource);
+		$("#lineChart").kendoChart({
 			title : {
 				text : "Wells Per State"
 			},
@@ -262,6 +260,8 @@ var utils = {};
 			kendo.ui.progress($('html'), false);
 			initFiltering(JSONData);
 			initCharts(JSONData);
+			// pull all the data in as soon as its available
+			_.each(dsRegistry, function(ds) { ds.read(); }); 
 		});
 	}
 	
@@ -288,15 +288,35 @@ var utils = {};
     var sideBar = {
         loadMap: function() {
             console.log('loading map. . .');
+			$("#map").css("display", "block");
+			$("#lineChart").css("display", "none");
+			$("#pieChart").css("display", "none");
+			$("#barChart").css("display", "none");
+			$("#table").css("display", "none");
         },
         loadPieChart: function() {
             console.log('loading pie chart. . .');
+			$("#map").css("display", "none");
+			$("#lineChart").css("display", "none");
+			$("#pieChart").css("display", "block");
+			$("#barChart").css("display", "none");
+			$("#table").css("display", "none");
         },
         loadLineChart: function() {
             console.log('loading line chart. . .');
+			$("#map").css("display", "none");
+			$("#lineChart").css("display", "block");
+			$("#pieChart").css("display", "none");
+			$("#barChart").css("display", "none");
+			$("#table").css("display", "none");
         },
         loadBarGraph: function() {
             console.log('loading bar graph. . .');
+			$("#map").css("display", "none");
+			$("#lineChart").css("display", "none");
+			$("#pieChart").css("display", "none");
+			$("#barChart").css("display", "block");
+			$("#table").css("display", "none");
         },
         loadExportView: function() {
             var $modal = $('#modal').kendoWindow({
