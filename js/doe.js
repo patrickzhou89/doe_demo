@@ -4,13 +4,16 @@ var utils = {};
 	
 	var THEME = 'material';
 	
-	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
+	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass',
+		GAS_WELLS_DAYS_ON = 'gasWellsDayson', NUM_GAS_WELLS = 'numGasWells',
+		OIL_WELLS_DAYS_ON = 'oilWellsDayson', NUM_OIL_WELLS = 'numOilWells',
+		GAS = 'gas', OIL = 'oil';
 	
 	var alwaysTrue = _.constant(true);
 	
 	var DOEData = null;
 	
-	var rateClasses = _.range(1, 27);
+	var rateClasses = _.range(1, 23); // 1 to 23 exclusive
 	
 	var dsRegistry = DOE.dsRegistry = [];
 	
@@ -43,23 +46,68 @@ var utils = {};
 	}
 	
 	function initCharts(JSONData) {
-
+		/*
+		JSONData = _.map(JSONData, function(item) {
+			return {
+				state: item.state,
+				prodYear: item.prodYear,
+				rateClass: item.rateClass,
+				daysOn: item.gasWellsDayson,
+				numWells: item.numGasWells,
+				type: GAS
+			};
+		}).concat(_.map(JSONData, function(item) {
+			return {
+				state: item.state,
+				prodYear: item.prodYear,
+				rateClass: item.rateClass,
+				daysOn: item.oilWellsDayson,
+				numWells: item.numOilWells,
+				type: OIL
+			};
+		}));
+		*/
 		var barChartDataSource = new kendo.data.DataSource({
-			data: JSONData.slice(0, 1000)
-			aggregate: {
-				
+			data: JSONData,
+			group: { 
+				field: 'rateClass', 
+				aggregates: [
+					{ field: 'numGasWells', aggregate: 'sum' },
+					{ field: 'numOilWells', aggregate: 'sum' }
+				]
 			}
 		});
-
+		barChartDataSource.read();
+		console.log(_.map(barChartDataSource.view(), function(item) {
+				return {
+					rateClass: item.value,
+					numGasWells: item.aggregates.numGasWells.sum,
+					numOilWells: item.aggregates.numOilWells.sum
+				};
+			}));
 		var barChart = $("#barChart").kendoChart({
-			dataSource: barChartDataSource,
-			series: [{ field: 'numGasWells' }, { field: 'numOilWells' }],
+			theme: THEME,
+			dataSource: _.map(barChartDataSource.view(), function(item) {
+				return {
+					rateClass: item.value,
+					numGasWells: item.aggregates.numGasWells.sum,
+					numOilWells: item.aggregates.numOilWells.sum
+				};
+			}),
+			seriesDefaults: { type: "column" },
+			series: [{
+				name: 'Number of Gas Wells',
+				field: 'numGasWells' 
+			}, {
+				name: 'Number of Oil Wells',
+				field: 'numOilWells' 
+			}],
 			categoryAxis: {
-				categories: rateClasses
+				field: 'rateClass'
+				//categories: rateClasses
 			}
 		});
 		return;
-		console.log(3);
 		
 		var lineChartDatasource = new kendo.data.DataSource({
 			schema : {
