@@ -245,9 +245,19 @@ var utils = {};
 		$('#second-filter').hide();
 		$('#third-filter').hide();
 	}
+	function initExportModule(){
+		var exportModule = {
+			loadExportView: function(){
+				console.log('loading export view. . .');
+			}
+		};
+		kendo.bind($('#sidebar'), kendo.observable(exportModule));
+	}
 	
 	function init() {
+
 		kendo.ui.progress($('html'), true);
+		initExportModule();
 		databaseReadPromise.then(function() {
 			var JSONData = database.data().toJSON();
 			kendo.ui.progress($('html'), false);
@@ -259,16 +269,22 @@ var utils = {};
 	$(init);
 	
 }());
-//begin navigation init
-(function() {
-    var header = {
-        toggleFiltering: function() {
-            $('#filter-bar').toggle('slide', {
-                direction: 'right'
-            }, 200);
-        }
-    };
-    kendo.bind($('#header'), kendo.observable(header));
+
+
+(function(){
+	var header = {
+		toggleFiltering:function(){
+			$('#filter-bar').toggle('slide',{direction:'right'},200);
+		}
+	};
+	kendo.bind($('#header'), kendo.observable(header));
+
+	var sidebar = {
+		toggleFiltering:function(){
+			this.toggle();
+		}
+	};
+	kendo.bind($('#sidebar'), kendo.observable(header));
 
     var sideBar = {
         loadMap: function() {
@@ -315,7 +331,8 @@ var utils = {};
                     });
                 },
                 close: function(){
-
+                	//reset filename field
+                	this.wrapper.find('#filename').val('');
                 }
             }).data('kendoWindow');
             $modal.open().center();
@@ -363,6 +380,10 @@ var utils = {};
         element.click();
         document.body.removeChild(element);
     };
+    utils.validateFilename = function(filename){
+    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
+    	return regex.test(filename);
+    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
@@ -376,11 +397,14 @@ var utils = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
+                console.log(utils.validateFilename(saveFileName));
+                if(!utils.validateFilename(saveFileName)){
+                	saveFileName += '.' + fileType;
+                }
             switch (true) {
                 case fileType === exportType.JSON:
                     var gridJSON = DOE.database.view(); //filtered datasource
                     utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
-                    $filenameInput.val('');
                     break;
                 case fileType === exportType.EXCEL:
                     $grid.saveAsExcel();
@@ -389,7 +413,6 @@ var utils = {};
                     var gridJSON = DOE.database.view(); //filtered datasource
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
-                    $filenameInput.val('');
                     break;
                 case fileType === exportType.PDF:
                     $grid.saveAsPDF();
