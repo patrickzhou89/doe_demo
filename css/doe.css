@@ -124,60 +124,37 @@ html, body {
   height: 100%;
   position: absolute;
   right: 0;
-  top: 0;
   border-left: 1px solid #e7e7e7;
   box-shadow: 0px 1px 4px #666; }
-
-#data-visualizer {
-  text-align: center;
-  padding: 5px 0 0 0;
-  height: 99%; }
-
-#table {
-  display: none; }
-
-#map {
-  display: none; }
-
-#barChart {
-  display: none; }
-
-#pieChart {
-  display: none; }
-
-#lineChart {
-  display: inline-block;
-  position: static !important;
-  height: 600px;
-  width: 90%;
-  position: static;
-  margin: auto; }
-
-.modal-row label {
-  display: block;
-  font-size: 14px;
-  font-weight: bold;
-  padding: 0 0 2px 0;
-  border-bottom: 1px solid #e7e7e7;
-  margin: 5px 0; }
-.modal-row input {
-  padding: 5px;
-  width: 388px; }
-
-#modal-actions {
-  text-align: right;
-  margin-top: 20px; }
-  #modal-actions button {
-    margin-left: 5px; }
 
 .filter-section {
   margin: 10px;
   padding: 10px; }
 
-.k-widget.k-window {
-  padding: 15px !important; }
-
-.k-window-content.k-content {
-  padding: 0 !important; }
-
 /*# sourceMappingURL=doe.css.map */
+
+
+#data-visulizer{
+	width:50%;
+	margin: auto;
+		
+}
+
+#table{
+		display:none;
+}
+#map{
+		display:none;
+}
+#barChart{
+	display:inline-block;
+	height: 600px;
+	width:100%;
+	margin: auto;
+}
+#pieChart{
+		display:none;
+}
+#lineChart{
+	display:none;
+}

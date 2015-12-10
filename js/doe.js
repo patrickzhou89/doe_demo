@@ -2,11 +2,15 @@ var DOE = {};
 var utils = {};
 (function() {
 	
+	var THEME = 'material';
+	
 	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
 	
 	var alwaysTrue = _.constant(true);
 	
 	var DOEData = null;
+	
+	var rateClasses = _.range(1, 27);
 	
 	var dsRegistry = DOE.dsRegistry = [];
 	
@@ -39,6 +43,24 @@ var utils = {};
 	}
 	
 	function initCharts(JSONData) {
+
+		var barChartDataSource = new kendo.data.DataSource({
+			data: JSONData.slice(0, 1000)
+			aggregate: {
+				
+			}
+		});
+
+		var barChart = $("#barChart").kendoChart({
+			dataSource: barChartDataSource,
+			series: [{ field: 'numGasWells' }, { field: 'numOilWells' }],
+			categoryAxis: {
+				categories: rateClasses
+			}
+		});
+		return;
+		console.log(3);
+		
 		var lineChartDatasource = new kendo.data.DataSource({
 			schema : {
 				model : {
@@ -71,6 +93,7 @@ var utils = {};
 		lineChartDatasource.read();
 		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
+			theme: THEME,
 			title : {
 				text : "Wells Per State"
 			},
@@ -254,7 +277,8 @@ var utils = {};
 				DOE.data = DOEData = result;
 				kendo.ui.progress($('html'), false);
 				initFiltering(DOEData);
-				initCharts(DOEData);					
+				initCharts(DOEData);
+				console.log('test');			
 			});
 	}
 	
