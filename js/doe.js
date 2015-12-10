@@ -35,7 +35,7 @@ var utils = {};
 					}
 				}
 				return values.indexOf(value) >= 0;
-			};
+			};			
 		}
 		_.each(dsRegistry, function(ds) {
 			ds.filter(newFilter);			
@@ -82,7 +82,6 @@ var utils = {};
 				}
 			},
 			data: JSONData,
-			aggregate: { field: '', aggregate: 'sum' }, 
 			group : {
 				field : "state"
 			},
