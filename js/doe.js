@@ -175,9 +175,18 @@ var DOE = {};
 		};
 		kendo.bind($('#filters'), kendo.observable(filtering));
 	}
+	function initExportModule(){
+		var exportModule = {
+			loadExportView: function(){
+				console.log('loading export view. . .');
+			}
+		};
+		kendo.bind($('#sidebar'), kendo.observable(exportModule));
+	}
 	
 	function init() {
 		kendo.ui.progress($('html'), true);
+		initExportModule();
 		databaseReadPromise.then(function() { 
 			kendo.ui.progress($('html'), false);
 			initFiltering();
