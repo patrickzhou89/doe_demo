@@ -2,7 +2,7 @@ var DOE = {};
 
 (function() {
 	
-	var STATE = 'state', PROD_YEAR = 'prod_year', RATE_CLASS = 'rate_class';
+	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
 	
 	var alwaysTrue = _.constant(true);
 	
@@ -60,6 +60,7 @@ var DOE = {};
 			{ field: PROD_YEAR, display: 'Years' }, 
 			{ field: RATE_CLASS, display: 'Rate Classes' }
 		];
+		var $secondFilter = $('#second-filter'), $thirdFilter = $('#third-filter');
 		var filtering = {
 			refreshFilters: function() {
 				$('#first-filter-select').data('kendoMultiSelect').refresh();
@@ -68,8 +69,6 @@ var DOE = {};
 			},
 			firstFilter: {
 				filterType: null,
-				display: true,
-				disabled: false,
 				filterTypeSource: new kendo.data.DataSource({
 					data: filterTypes
 				}),
@@ -80,14 +79,15 @@ var DOE = {};
 					if (!field) {
 						self.firstFilter.set('filterType', null);
 						self.firstFilter.set('dataSource', emptyDataSource);
-						self.secondFilter.set('display', false);
+						if (!$secondFilter.is(':hidden')) {
+							kendo.fx($secondFilter).expand('vertical').reverse();							
+						}
 						self.secondFilter.set('dataSource', emptyDataSource);
 					} else {
 						self.firstFilter.set('filterType', field);
 						self.firstFilter.set('dataSource', dataSourceMap[field]);
-						if (!self.secondFilter.display) {
-							kendo.fx($('#second-filter')).slideIn('down').play();
-							self.secondFilter.set('display', true);							
+						if ($secondFilter.is(':hidden')) {
+							kendo.fx($secondFilter).expand('vertical').play();
 						}
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('dataSource', emptyDataSource);
@@ -99,19 +99,20 @@ var DOE = {};
 							}
 						});
  					}
-					self.thirdFilter.set('display', false);
+					console.log($('#third-filter'));
+					if (!$thirdFilter.is(':hidden')) {
+						kendo.fx($thirdFilter).expand('vertical').reverse();
+					}
 					self.thirdFilter.set('dataSource', emptyDataSource);
 					self.refreshFilters();
 				},
-				dataSource: stateDataSource,
+				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
 					filterDatabase(this.firstFilter.filterType, event);
 				}
 			},
 			secondFilter: {
-				display: false,
-				disabled: false,
 				filterTypeSource: new kendo.data.DataSource({
 					data: filterTypes
 				}),
@@ -122,13 +123,14 @@ var DOE = {};
 					if (!field) {
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('dataSource', emptyDataSource);
-						self.thirdFilter.set('display', false);
+						if (!$thirdFilter.is(':hidden')) {
+							kendo.fx($thirdFilter).expand('vertical').reverse();							
+						}
 					} else {
 						self.secondFilter.set('filterType', field);
 						self.secondFilter.set('dataSource', dataSourceMap[field]);
-						if (!self.thirdFilter.display) {
-							kendo.fx($('#third-filter')).slideIn('down').play();
-							self.thirdFilter.set('display', true);							
+						if ($thirdFilter.is(':hidden')) {
+							kendo.fx($thirdFilter).expand('vertical').play();							
 						}
 						self.thirdFilter.filterTypeSource.filter({
 							field: 'field', 
@@ -145,15 +147,13 @@ var DOE = {};
 					self.refreshFilters();
 				},
 				filterType: null,
-				dataSource: [],
+				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
 					filterDatabase(this.secondFilter.filterType, event);
 				}
 			},
 			thirdFilter: {
-				display: false,
-				disabled: false,
 				filterTypeSource: new kendo.data.DataSource({
 					data: filterTypes
 				}),
@@ -166,7 +166,7 @@ var DOE = {};
 					self.refreshFilters();
 				},
 				filterType: null,
-				dataSource: [],
+				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
 					filterDatabase(this.thirdFilter.filterType, event);
@@ -174,10 +174,21 @@ var DOE = {};
 			}
 		};
 		kendo.bind($('#filters'), kendo.observable(filtering));
+		$('#second-filter').hide();
+		$('#third-filter').hide();
+	}
+	function initExportModule(){
+		var exportModule = {
+			loadExportView: function(){
+				console.log('loading export view. . .');
+			}
+		};
+		kendo.bind($('#sidebar'), kendo.observable(exportModule));
 	}
 	
 	function init() {
 		kendo.ui.progress($('html'), true);
+		initExportModule();
 		databaseReadPromise.then(function() { 
 			kendo.ui.progress($('html'), false);
 			initFiltering();
