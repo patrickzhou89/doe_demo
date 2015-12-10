@@ -80,9 +80,11 @@ var DOE = {};
 					} else {
 						self.firstFilter.set('filterType', field);
 						self.firstFilter.set('dataSource', dataSourceMap[field]);
-						kendo.fx($('#second-filter')).slideIn('down').play();
+						if (!self.secondFilter.display) {
+							kendo.fx($('#second-filter')).slideIn('down').play();
+							self.secondFilter.set('display', true);							
+						}
 						self.secondFilter.set('filterType', null);
-						self.secondFilter.set('display', true);
 						self.secondFilter.set('dataSource', emptyDataSource);
 						self.secondFilter.filterTypeSource.filter({
 							field: 'field', 
@@ -118,13 +120,17 @@ var DOE = {};
 					} else {
 						self.secondFilter.set('filterType', field);
 						self.secondFilter.set('dataSource', dataSourceMap[field]);
-						kendo.fx($('#third-filter')).slideIn('down').play();
-						self.thirdFilter.set('display', true);
+						if (!self.thirdFilter.display) {
+							kendo.fx($('#third-filter')).slideIn('down').play();
+							self.thirdFilter.set('display', true);							
+						}
 						self.thirdFilter.filterTypeSource.filter({
 							field: 'field', 
 							operator: function(field) {
-								var firstFilterType = $('#first-filter-type').data('kendoDropDownList').value();
-								var secondFilterType = $('#second-filter-type').data('kendoDropDownList').value();
+								var firstFilterType = 
+									$('#first-filter-type').data('kendoDropDownList').value();
+								var secondFilterType = 
+									$('#second-filter-type').data('kendoDropDownList').value();
 								return !(firstFilterType === field || secondFilterType === field);
 							}
 						});
