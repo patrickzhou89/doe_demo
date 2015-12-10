@@ -10,18 +10,22 @@
 
 </head>
 <body>
-	<div id='header'></div>
+	<div id='header'>
+		<div id='menu-wrapper'>
+			<img id='filter-button' data-bind='click:toggleFiltering'src='css/images/menu-icon.png'/>
+		</div>
+	</div>
 	<div id='content'>
 		<div id='sidebar'>
 			<ul>
-				<li><img src='css/images/map-icon.png'/><span>United States Map</span></li>
-				<li><img src='css/images/pie-chart-icon.png'/><span>Pie Chart</span></li>
-				<li><img src='css/images/line-graph-icon.png'/><span>Line Graph</span></li>
-				<li><img src='css/images/bar-graph-icon.png'/><span>Bar Graph</span></li>
+				<li data-bind="events:{click:loadMap}"><img src='css/images/map-icon.png'/><span>United States Map</span></li>
+				<li data-bind="events:{click:loadPieChart}"><img src='css/images/pie-chart-icon.png'/><span>Pie Chart</span></li>
+				<li data-bind="events:{click:loadLineChart}"><img src='css/images/line-graph-icon.png'/><span>Line Graph</span></li>
+				<li data-bind="events:{click:loadBarGraph}"><img src='css/images/bar-graph-icon.png'/><span>Bar Graph</span></li>
 				<li data-bind="events:{click:loadExportView}"><img src='css/images/export-icon.png'/><span>Export Data</span></li>
 			</ul>
 		</div>
-		<div id="map">
+		<div id="data-visulizer">
 			
 		</div>
 		<div id='filter-bar'>
@@ -62,7 +66,25 @@
 			</div>
 		</div>
 	</div>
+	<div id="modal">
+		<div class='modal-row'>
+			<label for='export-type'>Export Type:</label>
+			<input id='export-type' />
+		</div>
+		<div class='modal-row'>
+			<label for='filename'>File Name:</label>
+			<input id='filename' class='k-input k-text-box' type='text' placeholder='filename' />			
+		</div>
+		<div class='modal-row'>
+			<div id='modal-actions'>
+				<button class='k-button' data-bind='events:{click:exportRawData}'>Export</button>
+			<button class='k-button' data-bind='events:{click:cancelExport}'>Cancel</button>
+			</div>			
+		</div>
+	</div>	
 	<script src="js/jquery-1.11.3.min.js"></script>
+	<script src="js/jquery-ui.min.js"></script>
+	<script src="js/jszip.min.js"></script> <!-- required for excel export from kendo grid -->
 	<script src="js/kendo.all.min.js"></script>
 	<script src="js/lodash.min.js"></script>
 	<script src="js/doe.js"></script>
