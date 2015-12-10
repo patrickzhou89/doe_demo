@@ -29,8 +29,6 @@ var utils = {};
 		var values = event.sender.value(),
 			newFilter = database.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field });
-		var log = _.debounce(function(value) { console.log('value', value); }, 6000);
-		console.log('filterDatabase', field);
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;	
 		} else {
@@ -38,13 +36,10 @@ var utils = {};
 				values = _.map(values, function(year) { return '01/01/' + year; });
 			}
 			filter.operator = function(value) {
-				//console.log('value', value);
-				log(value);
 				return values.indexOf(value) >= 0;
 			};			
 		}
 		_.each(dsRegistry, function(ds) {
-			console.log(ds);
 			ds.filter(newFilter);			
 		});
 	}
