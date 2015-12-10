@@ -28,14 +28,22 @@ var utils = {};
 	function filterDatabase(field, event) {
 		var values = event.sender.value(),
 			newFilter = database.filter();
-			filter = _.find(newFilter.filters, function(item) { return item.field === field });
+			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
+			isProdYear = field === PROD_YEAR;
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;	
 		} else {
-			if (field === PROD_YEAR) {
-				values = _.map(values, function(year) { return '01/01/' + year; });
+			if (isProdYear) {
+				values = _.map(values, function(year) { return new Date('01/01/' + year).getTime(); });
 			}
 			filter.operator = function(value) {
+				if (isProdYear) {
+					if (value instanceof Date) {
+						value = value.getTime();
+					} else {
+						value = new Date(value).getTime();
+					}
+				}
 				return values.indexOf(value) >= 0;
 			};			
 		}
@@ -74,7 +82,7 @@ var utils = {};
 				dir : "asc"
 		}});
 		lineChartDatasource.read();
-		dbRegistry.push(lineChartDatasource);
+		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
 			title : {
 				text : "Wells Per State"
@@ -260,8 +268,6 @@ var utils = {};
 			kendo.ui.progress($('html'), false);
 			initFiltering(JSONData);
 			initCharts(JSONData);
-			// pull all the data in as soon as its available
-			_.each(dsRegistry, function(ds) { ds.read(); }); 
 		});
 	}
 	
