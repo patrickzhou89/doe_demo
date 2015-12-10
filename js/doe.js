@@ -78,8 +78,9 @@ var utils = {};
 				field : "prodYear",
 				dir : "asc"
 		}});
-		dsRegistry.push(lineChartDatasource);
-		$("#data-visulizer").kendoChart({
+		lineChartDatasource.read();
+		dbRegistry.push(lineChartDatasource);
+		$("#lineChart").kendoChart({
 			title : {
 				text : "Wells Per State"
 			},
@@ -292,15 +293,35 @@ var utils = {};
     var sideBar = {
         loadMap: function() {
             console.log('loading map. . .');
+			$("#map").css("display", "block");
+			$("#lineChart").css("display", "none");
+			$("#pieChart").css("display", "none");
+			$("#barChart").css("display", "none");
+			$("#table").css("display", "none");
         },
         loadPieChart: function() {
             console.log('loading pie chart. . .');
+			$("#map").css("display", "none");
+			$("#lineChart").css("display", "none");
+			$("#pieChart").css("display", "block");
+			$("#barChart").css("display", "none");
+			$("#table").css("display", "none");
         },
         loadLineChart: function() {
             console.log('loading line chart. . .');
+			$("#map").css("display", "none");
+			$("#lineChart").css("display", "block");
+			$("#pieChart").css("display", "none");
+			$("#barChart").css("display", "none");
+			$("#table").css("display", "none");
         },
         loadBarGraph: function() {
             console.log('loading bar graph. . .');
+			$("#map").css("display", "none");
+			$("#lineChart").css("display", "none");
+			$("#pieChart").css("display", "none");
+			$("#barChart").css("display", "block");
+			$("#table").css("display", "none");
         },
         loadExportView: function() {
             var $modal = $('#modal').kendoWindow({

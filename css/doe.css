@@ -135,7 +135,26 @@ html, body {
 
 
 #data-visulizer{
-		height: 600px;
-		width:50%;
-		margin: auto;
+	width:50%;
+	margin: auto;
+		
+}
+
+#table{
+		display:none;
+}
+#map{
+		display:none;
+}
+#barChart{
+		display:none;
+}
+#pieChart{
+		display:none;
+}
+#lineChart{
+	display:inline-block;
+	height: 600px;
+	width:100%;
+	margin: auto;
 }
