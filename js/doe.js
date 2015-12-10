@@ -319,9 +319,12 @@ var utils = {};
                         dataTextField: 'fileType',
                         dataValueField: 'ext',
                     });
+                },
+                close: function(){
+
                 }
             }).data('kendoWindow');
-            $modal.center();
+            $modal.open().center();
         }
     };
     kendo.bind($('#sidebar'), kendo.observable(sideBar));
@@ -369,7 +372,8 @@ var utils = {};
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
-                userFilename = $('#modal').find('#filename').val(),
+            	$filenameInput = $('#modal').find('#filename'), 
+                userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
                     JSON: 'json',
@@ -378,19 +382,20 @@ var utils = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
-                console.log('userFilename:',userFilename)
             switch (true) {
                 case fileType === exportType.JSON:
-                    var gridJSON = $grid.dataSource._pristineData; //data as it arrived from data source
+                    var gridJSON = DOE.database.view(); //filtered datasource
                     utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
+                    $filenameInput.val('');
                     break;
                 case fileType === exportType.EXCEL:
                     $grid.saveAsExcel();
                     break;
                 case fileType === exportType.XML:
-                    var gridJSON = $grid.dataSource._pristineData, //data as it arrived from data source
+                    var gridJSON = DOE.database.view(); //filtered datasource
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
+                    $filenameInput.val('');
                     break;
                 case fileType === exportType.PDF:
                     $grid.saveAsPDF();

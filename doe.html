@@ -66,17 +66,17 @@
 			</div>
 		</div>
 	</div>
-	<div id="modal" style='margin:auto;'>
+	<div id="modal">
 		<div class='modal-row'>
 			<label for='export-type'>Export Type:</label>
 			<input id='export-type' />
 		</div>
 		<div class='modal-row'>
 			<label for='filename'>File Name:</label>
-			<input id='filename' type='text' placeholder='filename' />			
+			<input id='filename' class='k-input k-text-box' type='text' placeholder='filename' />			
 		</div>
 		<div class='modal-row'>
-			<div id='modal-actions' style='bottom:0;position:relative;'>
+			<div id='modal-actions'>
 				<button class='k-button' data-bind='events:{click:exportRawData}'>Export</button>
 				<button class='k-button' data-bind='events:{click:cancelExport}'>Cancel</button>
 			</div>			
@@ -84,6 +84,7 @@
 	</div>	
 	<script src="js/jquery-1.11.3.min.js"></script>
 	<script src="js/jquery-ui.min.js"></script>
+	<script src="js/jszip.min.js"></script> <!-- required for excel export from kendo grid -->
 	<script src="js/kendo.all.min.js"></script>
 	<script src="js/lodash.min.js"></script>
 	<script src="js/doe.js"></script>
