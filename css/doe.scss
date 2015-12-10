@@ -76,23 +76,43 @@ html,body{
     background-color:black;
     opacity:.8;
     width:60px;
-    height:100%;
     position:absolute;
     left:0;
+    top:25%;
     box-shadow: 2px 0px 5px #666;
     margin:-1px 0 0 0;
-    ul{
-        li{
+    >ul{
+        >li{
             text-align:center;
+            span{
+                display:inline-block;
+                vertical-align:middle;
+                padding:5px 0 0 15px;
+                color: #fff;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
             img{
+                vertical-align:middle;
+                display:inline-block;
                 margin-top:5px;
             }
+            font-size:0;
             height:59px;
-            border-bottom: 1px solid #666;
+            width:60px;
+            overflow:hidden;
+            border-bottom: 2px solid #666;
             cursor:pointer;
+            -webkit-transition: width 2s ease-in-out;
+            transition:width .2s ease-in-out;
             &:hover{
-                opacity:.7;
-                background:#343434;
+                text-align:left;
+                padding-left:5px;
+                font-size:16px;
+                width:250px;
+                background:#808080;
+                border-right:5px solid #89c800;
+                border-bottom: 2px solid transparent;
             }
         }
     }

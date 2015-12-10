@@ -78,21 +78,40 @@ html, body {
   background-color: black;
   opacity: .8;
   width: 60px;
-  height: 100%;
   position: absolute;
   left: 0;
+  top: 25%;
   box-shadow: 2px 0px 5px #666;
   margin: -1px 0 0 0; }
-  #sidebar ul li {
+  #sidebar > ul > li {
     text-align: center;
+    font-size: 0;
     height: 59px;
-    border-bottom: 1px solid #666;
-    cursor: pointer; }
-    #sidebar ul li img {
+    width: 60px;
+    overflow: hidden;
+    border-bottom: 2px solid #666;
+    cursor: pointer;
+    -webkit-transition: width 2s ease-in-out;
+    transition: width .2s ease-in-out; }
+    #sidebar > ul > li span {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 5px 0 0 15px;
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.5px; }
+    #sidebar > ul > li img {
+      vertical-align: middle;
+      display: inline-block;
       margin-top: 5px; }
-    #sidebar ul li:hover {
-      opacity: .7;
-      background: #343434; }
+    #sidebar > ul > li:hover {
+      text-align: left;
+      padding-left: 5px;
+      font-size: 16px;
+      width: 250px;
+      background: #808080;
+      border-right: 5px solid #89c800;
+      border-bottom: 2px solid transparent; }
 
 #filter-bar {
   background-color: #F5F7F8;

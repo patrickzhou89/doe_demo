@@ -14,18 +14,11 @@
 	<div id='content'>
 		<div id='sidebar'>
 			<ul>
-				<li>US MAP</li>
-				<li><img src='css/images/pie-chart-icon.png'/></li>
-				<li>Line Graph</li>
-				<li>Bar Graph</li>
-				<li>
-					Export
-					<ul>
-						<li>JSON</li>
-						<li>XML</li>
-						<li>CSV</li>
-					</ul>
-				</li>
+				<li><img src='css/images/map-icon.png'/><span>United States Map</span></li>
+				<li><img src='css/images/pie-chart-icon.png'/><span>Pie Chart</span></li>
+				<li><img src='css/images/line-graph-icon.png'/><span>Line Graph</span></li>
+				<li><img src='css/images/bar-graph-icon.png'/><span>Bar Graph</span></li>
+				<li data-bind="events:{click:loadExportView}"><img src='css/images/export-icon.png'/><span>Export Data</span></li>
 			</ul>
 		</div>
 		<div id="map">
