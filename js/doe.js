@@ -39,9 +39,11 @@ var utils = {};
 				return values.indexOf(value) >= 0;
 			};			
 		}
+		/*
 		_.each(dbRegistry, function(db) {
 			db.filter(newFilter);			
 		});
+		*/
 	}
 	
 	function initCharts(JSONData) {
@@ -73,6 +75,7 @@ var utils = {};
 				field : "prodYear",
 				dir : "asc"
 		}});
+		lineChartDatasource.read();
 		dbRegistry.push(lineChartDatasource);
 		$("#data-visulizer").kendoChart({
 			title : {
