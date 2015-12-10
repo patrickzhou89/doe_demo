@@ -511,7 +511,7 @@ var utils = {};
 
     var sideBar = {
         loadMap: function() {
-        	var $map = $("#map"),
+        	var $map = $("#wellsMap"),
         		mapData = $map.data('kendoMap'),
         		$dataVizContaienr = $('#data-visulizer');
 
