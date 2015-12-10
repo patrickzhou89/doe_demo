@@ -2,19 +2,31 @@ var DOE = {};
 var utils = {};
 (function() {
 	
-	var THEME = 'material';
-	
-	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass',
-		GAS_WELLS_DAYS_ON = 'gasWellsDayson', NUM_GAS_WELLS = 'numGasWells',
-		OIL_WELLS_DAYS_ON = 'oilWellsDayson', NUM_OIL_WELLS = 'numOilWells',
-		GAS = 'gas', OIL = 'oil';
+	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
 	
 	var alwaysTrue = _.constant(true);
 	
 	var DOEData = null;
 	var DOEStateMap = null;
 	
-	var rateClasses = _.range(1, 23); // 1 to 23 exclusive
+	/*
+	var database = DOE.database = new kendo.data.DataSource({
+		transport: {
+			read: 'data/states.json'
+		},
+		//schema: { model: DataModel },
+		filter: {
+			logic: 'and',
+			filters: [
+				{ field: STATE, operator: alwaysTrue },
+				{ field: PROD_YEAR, operator: alwaysTrue },
+				{ field: RATE_CLASS, operator: alwaysTrue }
+			]
+		}
+	});
+	
+	var databaseReadPromise = database.read();
+	*/
 	
 	var dsRegistry = DOE.dsRegistry = [];
 	
@@ -47,44 +59,12 @@ var utils = {};
 	}
 	
 	function initCharts(JSONData) {
-		var barChartDataSource = new kendo.data.DataSource({
-			data: JSONData,
-			group: { 
-				field: 'rateClass', 
-				aggregates: [
-					{ field: 'numGasWells', aggregate: 'sum' },
-					{ field: 'numOilWells', aggregate: 'sum' }
-				]
-			}
-		});
-		barChartDataSource.read();
-		var barChart = $("#barChart").kendoChart({
-			theme: THEME,
-			dataSource: _.map(barChartDataSource.view(), function(item) {
-				return {
-					rateClass: item.value,
-					numGasWells: item.aggregates.numGasWells.sum,
-					numOilWells: item.aggregates.numOilWells.sum
-				};
-			}),
-			seriesDefaults: { type: "column" },
-			series: [{
-				name: 'Number of Gas Wells',
-				field: 'numGasWells' 
-			}, {
-				name: 'Number of Oil Wells',
-				field: 'numOilWells' 
-			}],
-			categoryAxis: {
-				field: 'rateClass'
-			}
-		});
 		initLineChart(JSONData);
 		initPieChart(JSONData);	
 		initTable(JSONData);
 	}
 	function initMaps(JSONdata){
-	$('#wellsMap').kendoMap({
+	$('#map').kendoMap({
     	center: [39.5, -120],
         zoom: 4,
         minSize: 300,
@@ -202,7 +182,6 @@ var utils = {};
 		lineChartDatasource.read();
 		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
-			theme: THEME,
 			title : {
 				text : "Wells Per State"
 			},
