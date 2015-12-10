@@ -83,7 +83,7 @@ var utils = {};
 						}
 					}
 				},
-				pageSize: 20
+				pageSize: 22
 			},
 			height: 550,
 			scrollable: true,
@@ -95,7 +95,7 @@ var utils = {};
 			},
 			columns: [
 				{ field: "state", title: "State" },
-				{ field: "prodYear", title: "Production Year" },
+				{ field: "prodYear", title: "Production Year", format:"{0:yyyy}" },
 				{ field: "rateClass", title: "Rate Class"},
 				{ field: "numOilWells", title: "# of Oil Wells" },
 				{ field: "oilProdBBL", title: "Barrels of Oil Produced" },
@@ -436,6 +436,10 @@ var utils = {};
         loadBarGraph: function() {
         	$("#barChart").show();
 			$("#pieChart, #map, #lineChart, #table").hide();
+        },
+		loadTable: function() {
+        	$("#table").show();
+			$("#pieChart, #map, #lineChart, #barChart").hide();
         },
         loadExportView: function() {
             var $modal = $('#modal').kendoWindow({
