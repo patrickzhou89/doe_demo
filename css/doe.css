@@ -136,8 +136,6 @@ html, body {
 
 #data-visulizer{
 		height: 600px;
-}
-
-.modal-row{
-	padding-bottom:2%;
+		width:50%;
+		margin: auto;
 }

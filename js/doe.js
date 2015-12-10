@@ -1,5 +1,5 @@
 var DOE = {};
-var utils = {};
+
 (function() {
 	
 	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
@@ -8,7 +8,7 @@ var utils = {};
 	
 	var database = new kendo.data.DataSource({
 		transport: {
-			read: 'data/statesNewer.json'
+			read: 'data/states.json'
 		},
 		filter: {
 			logic: 'and',
@@ -60,7 +60,7 @@ var utils = {};
 				}
 			},
 			transport: {
-				read: 'data/statesNewer.json',
+				read: 'data/states.json',
 				dataType:"json"
 			},
 			group : {
@@ -252,9 +252,18 @@ var utils = {};
 		$('#second-filter').hide();
 		$('#third-filter').hide();
 	}
+	function initExportModule(){
+		var exportModule = {
+			loadExportView: function(){
+				console.log('loading export view. . .');
+			}
+		};
+		kendo.bind($('#sidebar'), kendo.observable(exportModule));
+	}
 	
 	function init() {
 		kendo.ui.progress($('html'), true);
+		initExportModule();
 		databaseReadPromise.then(function() { 
 			kendo.ui.progress($('html'), false);
 			initFiltering();
@@ -265,149 +274,19 @@ var utils = {};
 	$(init);
 	
 }());
-//begin navigation init
-(function() {
-    var header = {
-        toggleFiltering: function() {
-            $('#filter-bar').toggle('slide', {
-                direction: 'right'
-            }, 200);
-        }
-    };
-    kendo.bind($('#header'), kendo.observable(header));
 
-    var sideBar = {
-        loadMap: function() {
-            console.log('loading map. . .');
-        },
-        loadPieChart: function() {
-            console.log('loading pie chart. . .');
-        },
-        loadLineChart: function() {
-            console.log('loading line chart. . .');
-        },
-        loadBarGraph: function() {
-            console.log('loading bar graph. . .');
-        },
-        loadExportView: function() {
-            var $modal = $('#modal').kendoWindow({
-                modal: true,
-                height: '40%',
-                width: '30%',
-                draggable: false,
-                pinned: true,
-                resizable: false,
-                activate: function() {
-                    this.wrapper.find('div.k-header').hide();
-                    this.wrapper.find('input#export-type').kendoDropDownList({
-                        dataSource: [{
-                            fileType: 'Spreadsheet (xlsx)',
-                            ext: 'excel'
-                        }, {
-                            fileType: 'Spreadsheet (csv)',
-                            ext: 'excel_csv'
-                        }, {
-                            fileType: 'PDF',
-                            ext: 'pdf'
-                        }, {
-                            fileType: 'JSON',
-                            ext: 'json'
-                        }, {
-                            fileType: 'XML',
-                            ext: 'xml'
-                        }],
-                        dataTextField: 'fileType',
-                        dataValueField: 'ext',
-                    });
-                },
-                close: function(){
+(function(){
+	var header = {
+		toggleFiltering:function(){
+			$('#filter-bar').toggle('slide',{direction:'right'},200);
+		}
+	};
+	kendo.bind($('#header'), kendo.observable(header));
 
-                }
-            }).data('kendoWindow');
-            $modal.open().center();
-        }
-    };
-    kendo.bind($('#sidebar'), kendo.observable(sideBar));
-}());
-//begin modal events 
-(function() {
-    //create utility functions
-    utils.gridJson2Xml = function(obj) {
-        var xml = '';
-        if (Object.keys(obj).length) {
-            var self = this,
-                consts = self.constants,
-                keyCount = undefined,
-                row_openTemplate = '',
-                row_closeTemplate = '';
-            xml = consts.XML_OPEN_TAG;
-            $(obj).each(function(index, rowJSON) {
-                keyCount = 0;
-                row_openTemplate = consts.OPEN_TAG + consts.ROW + '_' + index + consts.END_TAG;
-                row_closeTemplate = consts.OPEN_TAG + consts.FORWARD_SLASH + consts.ROW + '_' + index++ + consts.END_TAG;
-                xml += row_openTemplate + consts.NEW_LINE + consts.TAB;
-                for (var key in this) {
-                    var numKeys = Object.keys(this).length,
-                        value = this[key];
-                    xml += consts.OPEN_TAG + key + consts.END_TAG + value + consts.OPEN_TAG + consts.FORWARD_SLASH + key + consts.END_TAG + consts.NEW_LINE;
-                    if ((keyCount++ + 1) !== numKeys) {
-                        xml += consts.TAB;
-                    }
-                }
-                xml += row_closeTemplate + consts.NEW_LINE;
-
-            });
-        }
-        return xml;
-    };
-    utils.clientSideDownload = function(filename, content) {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
-        element.setAttribute('download', filename);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-    };
-    var modalEvents = {
-        exportRawData: function() {
-            var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
-            	$filenameInput = $('#modal').find('#filename'), 
-                userFilename = $filenameInput.val(),
-                saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
-                exportType = {
-                    JSON: 'json',
-                    EXCEL: 'excel',
-                    XML: 'xml',
-                    PDF: 'pdf',
-                    CSV: 'csv'
-                };
-            switch (true) {
-                case fileType === exportType.JSON:
-                    var gridJSON = DOE.database.view(); //filtered datasource
-                    utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
-                    $filenameInput.val('');
-                    break;
-                case fileType === exportType.EXCEL:
-                    $grid.saveAsExcel();
-                    break;
-                case fileType === exportType.XML:
-                    var gridJSON = DOE.database.view(); //filtered datasource
-                        xml = utils.gridJson2Xml(gridJSON);
-                    utils.clientSideDownload(saveFileName, xml);
-                    $filenameInput.val('');
-                    break;
-                case fileType === exportType.PDF:
-                    $grid.saveAsPDF();
-                    break;
-                default:
-                    console.log('no type found. . .');
-            };
-        },
-        cancelExport: function() {
-            var modalWindow = $('#modal').data('kendoWindow');
-            modalWindow.close();
-        }
-    };
-    kendo.bind($('#modal'), kendo.observable(modalEvents));
+	var sidebar = {
+		toggleFiltering:function(){
+			this.toggle();
+		}
+	};
+	kendo.bind($('#sidebar'), kendo.observable(header));
 }());
