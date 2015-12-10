@@ -20,15 +20,21 @@ var DOE = {};
 		}
 	});
 	
+	var databaseReadPromise = database.read();
+	
 	DOE.database = database;
 
 	function filterDatabase(field, event) {
 		var values = event.sender.value(),
 			newFilter = database.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field });
-		filter.operator = function(value) {
-			return values.indexOf(value) >= 0;
-		};
+		if (values.length === 0) {
+			filter.operator = alwaysTrue;	
+		} else {
+			filter.operator = function(value) {
+				return values.length === 0 || values.indexOf(value) >= 0;
+			};			
+		}
 		database.filter(newFilter);
 	}
 	
@@ -44,16 +50,10 @@ var DOE = {};
 		var rateClassDataSource = new kendo.data.DataSource({
 			data: _.range(1, 27)
 		});
-		function getDataSource(field) {
-			switch (field) {
-			case STATE:
-				return stateDataSource;
-			case PROD_YEAR:
-				return yearDataSource;
-			case RATE_CLASS:
-				return rateClassDataSource;
-			}
-		}
+		var dataSourceMap = {};
+		dataSourceMap[STATE] = stateDataSource;
+		dataSourceMap[PROD_YEAR] = yearDataSource;
+		dataSourceMap[RATE_CLASS] = rateClassDataSource;
 		var emptyDataSource = new kendo.data.DataSource({ data: [] });
 		var filterTypes = [
 			{ field: STATE, display: 'States' }, 
@@ -79,8 +79,7 @@ var DOE = {};
 						self.secondFilter.set('dataSource', emptyDataSource);
 					} else {
 						self.firstFilter.set('filterType', field);
-						self.firstFilter.set('dataSource', getDataSource(field));
-						self.firstFilter.set('dataSource', getDataSource(field));
+						self.firstFilter.set('dataSource', dataSourceMap[field]);
 						kendo.fx($('#second-filter')).slideIn('down').play();
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('display', true);
@@ -118,7 +117,7 @@ var DOE = {};
 						self.thirdFilter.set('display', false);
 					} else {
 						self.secondFilter.set('filterType', field);
-						self.secondFilter.set('dataSource', getDataSource(field));
+						self.secondFilter.set('dataSource', dataSourceMap[field]);
 						kendo.fx($('#third-filter')).slideIn('down').play();
 						self.thirdFilter.set('display', true);
 						self.thirdFilter.filterTypeSource.filter({
@@ -150,7 +149,7 @@ var DOE = {};
 						dataItem = event.sender.dataItem(event.item),
 						field = dataItem.field;
 					self.thirdFilter.set('filterType', field);
-					self.thirdFilter.set('dataSource', getDataSource(field));
+					self.thirdFilter.set('dataSource', dataSourceMap[field]);
 				},
 				filterType: null,
 				dataSource: [],
@@ -165,7 +164,7 @@ var DOE = {};
 	
 	function init() {
 		kendo.ui.progress($('html'), true);
-		database.read().done(function() { 
+		databaseReadPromise.then(function() { 
 			kendo.ui.progress($('html'), false);
 			initFiltering();
 		});
