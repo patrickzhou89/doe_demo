@@ -58,34 +58,72 @@ var utils = {};
 	}
 	
 	function initCharts(JSONData) {
+		initLineChart(JSONData);
+		initPieChart(JSONData);	
+		initTable(JSONData);
+	}
+	
+	function initTable(JSONData){
+		$("#table").kendoGrid({
+			dataSource: {
+				data: JSONData,
+				schema: {
+					model: {
+						fields: {
+							state: { type: "string" },
+							prodYear: { type: "date" },
+							rateClass: { type: "number" },
+							numOilWells: { type: "number" },
+							oilProdBBL: { type: "number" },
+							oilWellsDayson: { type: "number" },
+							numGasWells: { type: "number" },
+							condenProdBBL: { type: "number" },
+							gasWellsDayson: { type: "number" }
+						}
+					}
+				},
+				pageSize: 20
+			},
+			height: 550,
+			scrollable: true,
+			sortable: true,
+			filterable: true,
+			pageable: {
+				input: true,
+				numeric: false
+			},
+			columns: [
+				{ field: "state", title: "State" },
+				{ field: "prodYear", title: "Production Year" },
+				{ field: "rateClass", title: "Rate Class"},
+				{ field: "numOilWells", title: "# of Oil Wells" },
+				{ field: "oilProdBBL", title: "Barrels of Oil Produced" },
+				{ field: "oilWellsDayson", title: "# of Days Oil Wells On" },
+				{ field: "numGasWells", title: "# of Gas Wells"},
+				{ field: "condenProdBBL", title: "condenProdBBL" },
+				{ field: "gasWellsDayson", title: "# of Days Gas Wells On" }
+			]
+		});
+		
+		
+	}
+	
+	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
 			schema : {
 				model : {
 					fields : {
-						prodYear : {
-							type : 'date'
-						},
-						state : {
-							type : 'string'
-						},
-						rateClass : {
-							type : 'number'
-						},
-						numOilWells : {
-							type : 'number'
-						}
-						
+						prodYear : {type : 'date'},
+						state : {type : 'string'},
+						rateClass : {type : 'number'},
+						numOilWells : {type : 'number'}	
 					}
 				}
 			},
 			data: JSONData,
 			group : {
 				field : "state"
-			},
-			sort : {
-				field : "prodYear",
-				dir : "asc"
-		}});
+			}});
 		lineChartDatasource.read();
 		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
@@ -124,7 +162,46 @@ var utils = {};
 				visible : true,
 				template : "State: #= series.name #: #= value #"
 			}
-		});		
+		});	
+	}
+	
+	
+	function initPieChart(JSONData){
+		var pieChartDatasource = new kendo.data.DataSource({
+			data: JSONData,
+			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
+			group:{field: "state",
+				aggregates: [{ field: "numOilWells", aggregate: "sum" }]
+			}
+			
+			
+		});
+		pieChartDatasource.read();
+		
+		var series = [],
+		items = pieChartDatasource.view(),
+		length = items.length,
+		item;
+		//create the chart series  
+		for (var i = 0; i < length; i++) {
+			item = items[i];
+			series.push({ category: item.value, value: item.aggregates.numOilWells.sum})
+		}
+		dsRegistry.push(pieChartDatasource);
+		$("#pieChart").kendoChart({
+			title : {
+				text : "Wells Per State"
+			},
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartDatasource,
+			series: [{data:series}],
+			tooltip: {
+				visible: true
+			}
+			
+		});	
 	}
 	
 	function initFiltering(JSONData) {
