@@ -105,7 +105,8 @@ html, body {
   left: 0;
   top: 25%;
   box-shadow: 2px 0px 5px #666;
-  margin: -1px 0 0 0; }
+  margin: -1px 0 0 0;
+  z-index: 10; }
   #sidebar > ul > li {
     text-align: center;
     font-size: 0;
@@ -144,12 +145,18 @@ html, body {
   right: 0;
   top: 0;
   border-left: 1px solid #e7e7e7;
-  box-shadow: 0px 1px 4px #666; }
+  box-shadow: 0px 1px 4px #666;
+  z-index: 10; }
 
 #data-visualizer {
   text-align: center;
   padding: 5px 0 0 0;
   height: 99%; }
+  #data-visualizer > div {
+    width: 90%;
+    position: static;
+    margin: auto;
+    height: 600px; }
 
 #table {
   display: none; }
@@ -166,10 +173,7 @@ html, body {
 #lineChart {
   display: inline-block;
   position: static !important;
-  height: 600px;
-  width: 90%;
-  position: static;
-  margin: auto; }
+  height: 600px; }
 
 .modal-row label {
   display: block;

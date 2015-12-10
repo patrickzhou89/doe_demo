@@ -63,6 +63,60 @@ var utils = {};
 		initPieChart(JSONData);	
 		initTable(JSONData);
 	}
+	function initMaps(JSONdata){
+	$('#map').kendoMap({
+    	center: [39.5, -120],
+        zoom: 4,
+        minSize: 300,
+        controls:{
+          	attribution: false,
+           	navigator: false,
+           	zoom: false
+        },
+        zoomable: false,
+        layers: [{
+            type: "shape",
+              	dataSource: {
+           	    type: "geojson",
+               	transport: {
+                	read: "data/us.geo.json"
+               	}
+           	},
+            style: {
+                fill: {
+                    opacity: 0.7,
+                    color: 'blue'
+                }
+            }
+        }],
+        shapeCreated: function(e){
+          	var shape = e.shape,
+           		createdState = shape.dataItem.properties.name,
+           		filteredData = DOEData,
+           		oilSumTotal = 0,
+           		gasSumTotal = 0,
+           		stateGasTotal = 0,
+           		stateOilTotal = 0;
+           		stateData = $.map(filteredData, function(n, i){
+           			oilSumTotal += n.numOilWells;
+           			gasSumTotal += n.numGasWells;
+           			if(DOEStateMap[n.state] === createdState){
+           				stateOilTotal += n.numOilWells;
+           				stateGasTotal += n.numGasWells;             				
+           				return n;
+           			}
+           		});
+            		// console.log('stateOilTotal:', stateOilTotal);
+            		// console.log('stateGasTotal:', stateGasTotal);
+            		// console.log('oilSumTotal:', oilSumTotal);
+            		// console.log('gasSumTotal:', gasSumTotal); 
+            		// console.log('% gas usage by state ' + createdState +':', (stateGasTotal / gasSumTotal) * 100);
+            		// console.log('% oil usage by state ' + createdState +':', (stateOilTotal / oilSumTotal) * 100);     		
+            		// console.log('shape:', shape);
+       		shape.options.fill.opacity = (stateOilTotal / oilSumTotal) * 100;
+            }
+         });				
+	}
 	
 	function initTable(JSONData){
 		$("#table").kendoGrid({
@@ -85,7 +139,7 @@ var utils = {};
 				},
 				pageSize: 22
 			},
-			height: 550,
+			height: 600,
 			scrollable: true,
 			sortable: true,
 			filterable: true,
@@ -131,6 +185,7 @@ var utils = {};
 			title : {
 				text : "Wells Per State"
 			},
+			theme:"material",
 			dataSource : lineChartDatasource,
 			series : [ {
 				type : "line",
@@ -175,8 +230,6 @@ var utils = {};
 				aggregates: [{ field: "numOilWells", aggregate: "sum" },
 				{ field: "numGasWells", aggregate: "sum" }]
 			}
-			
-			
 		});
 		pieChartDatasource.read();
 		
@@ -212,6 +265,7 @@ var utils = {};
 			title : {
 				text : "Gas Wells per Rate Class"
 			},
+			theme:"material",
 			seriesDefaults: {
 				type: "pie"
 			},
@@ -369,7 +423,8 @@ var utils = {};
 				DOE.data = DOEData = result;
 				kendo.ui.progress($('html'), false);
 				initFiltering(DOEData);
-				initCharts(DOEData);					
+				initCharts(DOEData);
+				initMaps(DOEData);					
 			});
 		$.get('data/states_hash.json', {}, 
 			function(result) {
@@ -414,7 +469,7 @@ var utils = {};
             });
         },
         close: function(){
-        	this.wrapper.find('#filename').val('');
+        	//this.wrapper.find('#filename').val('');
         }
     }).data('kendoWindow');
     $('#modal').siblings('.k-header').remove();
@@ -493,6 +548,7 @@ var utils = {};
                 },
                 close: function(){
                 	//reset filename field
+                	console.log(this.wrapper)
                 	this.wrapper.find('#filename').val('');
                 }
             }).data('kendoWindow');
@@ -583,8 +639,8 @@ var utils = {};
             };
         },
         cancelExport: function() {
-            var modalWindow = $('#modal').data('kendoWindow');
-            modalWindow.close();
+        	//console.log('jdad');
+            $('#modal').data('kendoWindow').close();
         }
     };
     kendo.bind($('#modal'), kendo.observable(modalEvents));
