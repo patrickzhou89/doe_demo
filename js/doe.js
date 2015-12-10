@@ -552,43 +552,7 @@ var utils = {};
 			$("#pieChart, #map, #lineChart, #barChart").hide();
         },
         loadExportView: function() {
-            var $modal = $('#modal').kendoWindow({
-                modal: true,
-                height: '40%',
-                width: '30%',
-                draggable: false,
-                pinned: true,
-                resizable: false,
-                activate: function() {
-                    this.wrapper.find('div.k-header').hide();
-                    this.wrapper.find('input#export-type').kendoDropDownList({
-                        dataSource: [{
-                            fileType: 'Spreadsheet (xlsx)',
-                            ext: 'excel'
-                        }, {
-                            fileType: 'Spreadsheet (csv)',
-                            ext: 'excel_csv'
-                        }, {
-                            fileType: 'PDF',
-                            ext: 'pdf'
-                        }, {
-                            fileType: 'JSON',
-                            ext: 'json'
-                        }, {
-                            fileType: 'XML',
-                            ext: 'xml'
-                        }],
-                        dataTextField: 'fileType',
-                        dataValueField: 'ext',
-                    });
-                },
-                close: function(){
-                	//reset filename field
-                	console.log(this.wrapper)
-                	this.wrapper.find('#filename').val('');
-                }
-            }).data('kendoWindow');
-            $modal.open().center();
+        	$modal.open().center();
         }
     };
     kendo.bind($('#sidebar'), kendo.observable(sideBar));
