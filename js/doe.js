@@ -129,7 +129,7 @@ var chartref = {};
 			}],
 			tooltip : {
 				visible : true,
-				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#"
 			}
 		});		
 	}
@@ -421,7 +421,7 @@ var chartref = {};
 			},
 			tooltip : {
 				visible : true,
-				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#"
 			}
 		});	
 		wellLines.resize();
