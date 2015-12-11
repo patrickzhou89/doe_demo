@@ -445,7 +445,7 @@ var chartref = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.firstFilter.filterType, event);
+					applyFilters(this.firstFilter.filterType, event);
 				}
 			},
 			secondFilter: {
@@ -469,7 +469,7 @@ var chartref = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.secondFilter.filterType, event);
+					applyFilters(this.secondFilter.filterType, event);
 				}
 			}
 		};
