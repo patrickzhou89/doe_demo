@@ -238,7 +238,6 @@ var chartref = {};
 			oilDaysOnSeries.push({type : "line",name: "Oil Days On", category: item.value, value: item.aggregates.gasWellsDayson.sum});
 		}
 		
-		dsRegistry.push(lineChartDatasource);
 		$("#daysOnLineChart").kendoChart({
 			title : {
 				text : "Days On per Rate Class"
@@ -292,7 +291,6 @@ var chartref = {};
 	function initPieChart(JSONData){
 		var pieChartDatasource = new kendo.data.DataSource({
 			data: JSONData,
-			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
 			group:{field: "rateClass",
 				aggregates: [{ field: "numOilWells", aggregate: "sum" },
 				{ field: "numGasWells", aggregate: "sum" }]
@@ -327,7 +325,7 @@ var chartref = {};
 			}
 			
 		});	
-		
+		registerDataSource($("#wellsOilPieChart").data('kendoChart').dataSource);
 		$("#wellsGasPieChart").kendoChart({
 			title : {
 				text : "Gas Wells per Rate Class"
@@ -343,6 +341,7 @@ var chartref = {};
 			}
 			
 		});	
+		registerDataSource($("#wellsGasPieChart").data('kendoChart').dataSource);
 		
 		$("#daysOnOilPieChart").kendoChart({
 			title : {
@@ -358,6 +357,7 @@ var chartref = {};
 			}
 			
 		});	
+		registerDataSource($("#daysOnOilPieChart").data('kendoChart').dataSource);
 		
 		$("#daysOnGasPieChart").kendoChart({
 			title : {
@@ -373,7 +373,7 @@ var chartref = {};
 				visible: true
 			}
 		});	
-		registerDataSource($("#wellsGasPieChart").data('kendoChart').dataSource);
+		registerDataSource($("#daysOnGasPieChart").data('kendoChart').dataSource);
 	}
 	
 	function initFiltering(JSONData) {
@@ -472,11 +472,9 @@ var chartref = {};
 	}
 	
 	function init() {
-		console.log('test 1');
 		kendo.ui.progress($('html'), true);
 		$.get('data/states.json', {}, 
 			function(result) {
-				console.log('test');
 				DOE.data = DOEData = result;
 				kendo.ui.progress($('html'), false);
 				initFiltering(DOEData);
