@@ -307,17 +307,12 @@ var chartref = {};
 					format : "{0}"
 				}
 			},
-			categoryAxis: {
-				labels: {
-					rotation: 90
-				}								
-			},
 			tooltip : {
 				visible : true
 			}
 		});	
 		
-		var wellLines = ("#wellsLineChart").kendoChart({
+		var wellLines = $("#wellsLineChart").kendoChart({
 			title : {
 				text : "Wells per Rate Class"
 			},
@@ -344,11 +339,6 @@ var chartref = {};
 					format : "yyyy",
 					rotation : 315
 				}
-			},
-			categoryAxis: {
-				labels: {
-					rotation: 90
-				}								
 			},
 			tooltip : {
 				visible : true,
@@ -619,34 +609,31 @@ var chartref = {};
         	var $map = $("#wellsMap"),
         		mapData = $map.data('kendoMap'),
         		$dataVizContainer = $('#data-visualizer');
-    		$("#map").show();
-			$("#lineChart, #pieChart, #barChart, #table").hide();
+    		$("#map").css({'position':'static'});
+			$("#lineChart, #pieChart, #barChart, #table").css({'position':'absolute'});
         },
         loadPieChart: function() {
         	if(chartref['pie']){
         		chartref['pie'].resize();
         	}
-			$("#pieChart").show();
-			$("#lineChart, #map, #barChart, #table").hide();
+			$("#pieChart").css({'position':'static'});
+			$("#lineChart, #map, #barChart, #table").css({'position':'absolute'});
         	
         },
         loadLineChart: function() {
         	if(chartref['line']){
         		chartref['line'].resize();
         	}
-        	$("#lineChart").show();
-        	$('#lineChart').children().each(function(){
-        		$(this).data('kendoChart').resize();
-        	})
-			$("#pieChart, #map, #barChart, #table").hide();
+        	$("#lineChart").css({'position':'static'});
+			$("#pieChart, #map, #barChart, #table").css({'position':'absolute'});
         },
         loadBarGraph: function() {
-        	$("#barChart").show();
-			$("#pieChart, #map, #lineChart, #table").hide();
+        	$("#barChart").css({'position':'static'});
+			$("#pieChart, #map, #lineChart, #table").css({'position':'absolute'});
         },
 		loadTable: function() {
-        	$("#table").show();
-			$("#pieChart, #map, #lineChart, #barChart").hide();
+        	$("#table").css({'position':'static'});
+			$("#pieChart, #map, #lineChart, #barChart").css({'position':'absolute'});
         },
         loadExportView: function() {
             $('#modal').data('kendoWindow').open().center();
