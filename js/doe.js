@@ -469,13 +469,18 @@ var chartref = {};
 				text : "Oil Wells per Rate Class"
 			},
 			seriesDefaults: {
+				labels: {
+			template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:oilSeries}],
 			tooltip : {
 				visible : true,
-				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				template: "Rate Class: #: category# <br/> Wells: #=kendo.toString(value, 'n0')#",
 				color: 'white'
 			},
 			legend:{
@@ -489,13 +494,18 @@ var chartref = {};
 			},
 			theme:"material",
 			seriesDefaults: {
+				labels: {
+			template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:gasSeries}],
 			tooltip : {
 				visible : true,
-				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				template: "Rate Class: #: category# <br/> Wells: #=kendo.toString(value, 'n0')#",
 				color: 'white'
 			},
 			legend:{
@@ -507,6 +517,11 @@ var chartref = {};
 				text : "Oil Days On per Rate Class"
 			},
 			seriesDefaults: {
+				labels: {
+			template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
@@ -527,6 +542,11 @@ var chartref = {};
 			},
 			theme:"material",
 			seriesDefaults: {
+				labels: {
+					template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
