@@ -165,26 +165,14 @@ html, body {
   left: 120%; }
 
 #map {
-<<<<<<< HEAD
-  display: block;
-  width: 100%; 
-  height: 600px;
-}
-
-#barChart {
-  display: none; 
-  height: 600px;
-}
-
-#pieChart {
-  display: none; 
-  height: 600px;
-}
-=======
   left: 120%; }
   #map > div {
     height: 400px;
     width: 100%; }
+  #map > span {
+    width: 60%;
+    margin: auto;
+    font-size: 18px; }
 
 #barChart {
   position: absolute;
@@ -203,7 +191,6 @@ html, body {
       height: 400px;
       width: 49%;
       flex: 1; }
->>>>>>> 109aece7e51f20d033b5cba0653e13aa5ec30e1a
 
 #lineChart {
   position: absolute;
@@ -239,7 +226,7 @@ html, body {
   padding: 10px; }
   .filter-section .k-widget.k-dropdown.k-header {
     margin: 0 0 10px 0; }
-  .filter-section input {
+  .filter-section input[type='text'] {
     display: none; }
 
 .k-widget.k-window {

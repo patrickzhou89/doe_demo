@@ -203,7 +203,7 @@ var chartref = {};
 		});
 		registerDataSource(ds);		
 	var wellmap = $('#wellsMap').kendoMap({
-    	center: [38.5, -90],
+    	center: [38.5, -96],
         zoom: 4,
         controls:{
           	attribution: false,
@@ -239,14 +239,14 @@ var chartref = {};
 
 	wellmap.resize();
 	var dayson = $('#daysOnMap').kendoMap({
-    	center: [38.5, -90],
+    	center: [38.5, -96],
         zoom: 4,
         controls:{
           	attribution: false,
            	navigator: false,
            	zoom: false
         },
-        pannable:true,
+        pannable:false,
         zoomable: false,
         layers: [{
             type: "shape",

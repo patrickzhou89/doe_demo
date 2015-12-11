@@ -174,10 +174,17 @@ html,body{
     left:120%;
 }
 #map{
-    left:120%;>div{
-            height:400px;
-            width:100%;
-        }
+    left:120%;
+    >div{
+        height:400px;
+        width:100%;
+    }
+    >span{
+        width:60%;
+        margin:auto;
+        font-size:18px;
+        
+    }
 }
 #barChart{
     position:absolute;
@@ -239,7 +246,7 @@ html,body{
     .k-widget.k-dropdown.k-header{
         margin: 0 0 10px 0;
     }
-    input{
+    input[type='text']{
         display:none;
     }
 }
