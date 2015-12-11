@@ -460,15 +460,17 @@ var chartref = {};
 	}
 	
 	function init() {
+		console.log('test 1');
 		kendo.ui.progress($('html'), true);
 		$.get('data/states.json', {}, 
 			function(result) {
+				console.log('test');
 				DOE.data = DOEData = result;
 				kendo.ui.progress($('html'), false);
 				initFiltering(DOEData);
 				initCharts(DOEData);					
-				initMaps(DOEData);					
-			});
+				initMaps(DOEData);
+			}, 'json');
 		$.get('data/states_hash.json', {}, 
 			function(result) {
 				DOEStateMap = result;				
