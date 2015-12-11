@@ -223,7 +223,7 @@ var chartref = {};
             style: {
                 fill: {
                     opacity: 0,
-                    color: '#3E2723'
+                    color: '#FF9800'
                 }
             }
         }],
@@ -259,7 +259,7 @@ var chartref = {};
             style: {
                 fill: {
                     opacity: 0,
-                    color: '#3E2723'
+                    color: '#FF9800'
                 }
             }
         }],
@@ -805,20 +805,23 @@ var chartref = {};
                     XML: 'xml',
                     PDF: 'pdf'
                 };
-            switch (true) {
-                case fileType === exportType.JSON:
+            switch (fileType) {
+                case exportType.JSON:{
                     var gridJSON = $grid.dataSource.view(); //filtered datasource
                     utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
                     break;
-                case fileType === exportType.EXCEL:
+                }
+                case exportType.EXCEL:{
                     $grid.saveAsExcel();
                     break;
-                case fileType === exportType.XML:
+                }
+                case exportType.XML:{
                     var gridJSON = $grid.dataSource.view(), //filtered datasource
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
                     break;
-                case exportType.PDF:
+                }
+                case exportType.PDF:{
                 	//topkek
                     $("#table").css({'position':'static','margin-top':'1000px'});
                     $grid.saveAsPDF().done(function(){
@@ -826,9 +829,11 @@ var chartref = {};
                     	
                     });
                     break;
-                default:
+                }
+                default:{
                     console.log('no type found. . .');
                     break;
+                }
                 
             };
         },
