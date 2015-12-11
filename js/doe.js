@@ -64,7 +64,7 @@ var chartref = {};
 		registerDataSource(ds);
 		$("#wellsBarChart").kendoChart({
 			theme: THEME,
-			title: 'Number of Wells',
+			title: 'Wells per Rate Class',
 			dataSource: ds, 
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -76,17 +76,30 @@ var chartref = {};
 					rotation: -45
 				}								
 			},
+			valueAxis : {
+				labels : {
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+					}
+				}
+			},
 			series: [{
 				name: 'Number of Gas Wells',
 				field: 'numGasWells' 
 			}, {
 				name: 'Number of Oil Wells',
 				field: 'numOilWells' 
-			}]
+			}],
+			tooltip : {
+				visible : true,
+				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+			}
 		});
 		$("#daysOnBarChart").kendoChart({
 			theme: THEME,
-			title: 'Well Days On',
+			title: 'Days On per Rate Class',
 			dataSource: ds,
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -98,13 +111,26 @@ var chartref = {};
 					rotation: -45
 				}								
 			},
+			valueAxis : {
+				labels : {
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+					}
+				}
+			},
 			series: [{
 				name: 'Gas Wells Days On',
 				field: 'gasWellsDayson' 
 			}, {
 				name: 'Oil Well Days On',
 				field: 'oilWellsDayson' 
-			}]
+			}],
+			tooltip : {
+				visible : true,
+				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+			}
 		});		
 	}
 	
@@ -282,7 +308,7 @@ var chartref = {};
 		item;
 		$("#daysOnLineChart").kendoChart({
 			title : {
-				text : "Wells Per State"
+				text : "Days On per Rate Class"
 			},
 			theme: THEME,
 			seriesDefaults: { 
@@ -292,10 +318,10 @@ var chartref = {};
 			},
 			dataSource : lineChartDatasource,
 			series: [{
-				name: 'Gas Wells Days On',
+				name: 'Gas',
 				field: 'gasWellsDayson' 
 			}, {
-				name: 'Oil Well Days On',
+				name: 'Oil',
 				field: 'oilWellsDayson' 
 			}],
 			legend : {
@@ -304,10 +330,20 @@ var chartref = {};
 			},
 			valueAxis : {
 				labels : {
-					format : "{0}"
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+			}
 				}
 			},
+			categoryAxis: {
+				labels: {
+					rotation: -45
+				}								
+			},
 			tooltip : {
+				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
 				visible : true
 			}
 		});	
@@ -336,13 +372,21 @@ var chartref = {};
 			}],
 			valueAxis : {
 				labels : {
-					format : "yyyy",
-					rotation : 315
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+					}
 				}
+			},
+			categoryAxis: {
+				labels: {
+					rotation: -45
+				}								
 			},
 			tooltip : {
 				visible : true,
-				template : "State: #= series.name #: #= value #"
+				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
 			}
 		});	
 		wellLines.resize();
