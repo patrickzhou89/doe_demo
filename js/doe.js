@@ -35,22 +35,11 @@ var chartref = {};
 	function filterDataSource(ds, field, event) {
 		var values = event.sender.value(),
 			newFilter = ds.filter();
-			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
-			isProdYear = field === PROD_YEAR;
+			filter = _.find(newFilter.filters, function(item) { return item.field === field });
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;
 		} else {
-			if (isProdYear) {
-				values = _.map(values, function(year) { return new Date('01/01/' + year).getTime(); });
-			}
 			filter.operator = function(value) {
-				if (isProdYear) {
-					if (value instanceof Date) {
-						value = value.getTime();
-					} else {
-						value = new Date(value).getTime();
-					}
-				}
 				return values.indexOf(value) >= 0;
 			};			
 		}
@@ -87,7 +76,7 @@ var chartref = {};
 				name: 'Number of Oil Wells',
 				field: 'numOilWells' 
 			}]
-		});		
+		});
 		registerDataSource($("#wellsBarChart").data('kendoChart').dataSource);
 		$("#daysOnBarChart").kendoChart({
 			theme: THEME,
@@ -206,6 +195,8 @@ var chartref = {};
 				{ field: "gasWellsDayson", title: "# of Days Gas Wells On" }
 			]
 		});
+		//console.log('table', $("#table").data('kendoGrid').dataSource);
+		registerDataSource($("#table").data('kendoGrid').dataSource);
 	}
 	
 	function initLineChart(JSONData){
@@ -298,8 +289,8 @@ var chartref = {};
 				{ field: "gasWellsDayson", aggregate: "sum" }]
 			}
 		});
-		pieChartDatasource.read();
-		
+		registerDataSource(pieChartDatasource);
+		//console.log('pieChartDatasource', pieChartDatasource);
 		var oilSeries = [],
 		gasSeries = [],
 		gasDaysOnSeries = [],
@@ -315,7 +306,6 @@ var chartref = {};
 			gasDaysOnSeries.push({category: item.value, value: item.aggregates.oilWellsDayson.sum});
 			oilDaysOnSeries.push({category: item.value, value: item.aggregates.gasWellsDayson.sum});
 		}
-		dsRegistry.push(pieChartDatasource);
 		
 		$("#wellsOilPieChart").kendoChart({
 			title : {
@@ -331,7 +321,7 @@ var chartref = {};
 			}
 			
 		});	
-		registerDataSource($("#wellsOilPieChart").data('kendoChart').dataSource);
+
 		$("#wellsGasPieChart").kendoChart({
 			title : {
 				text : "Gas Wells per Rate Class"
@@ -347,7 +337,6 @@ var chartref = {};
 			}
 			
 		});	
-		registerDataSource($("#wellsGasPieChart").data('kendoChart').dataSource);
 		
 		$("#daysOnOilPieChart").kendoChart({
 			title : {
@@ -363,7 +352,6 @@ var chartref = {};
 			}
 			
 		});	
-		registerDataSource($("#daysOnOilPieChart").data('kendoChart').dataSource);
 		
 		$("#daysOnGasPieChart").kendoChart({
 			title : {
@@ -379,7 +367,6 @@ var chartref = {};
 				visible: true
 			}
 		});	
-		registerDataSource($("#daysOnGasPieChart").data('kendoChart').dataSource);
 	}
 	
 	function initFiltering(JSONData) {
@@ -399,8 +386,7 @@ var chartref = {};
 		dataSourceMap[RATE_CLASS] = rateClassDataSource;
 		var filterTypes = [
 			{ field: STATE, display: 'States' }, 
-			{ field: PROD_YEAR, display: 'Years' }, 
-			{ field: RATE_CLASS, display: 'Rate Classes' }
+			{ field: PROD_YEAR, display: 'Years' }
 		];
 		var $secondFilter = $('#second-filter');
 		var filtering = {
