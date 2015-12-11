@@ -129,7 +129,7 @@ var chartref = {};
 			}],
 			tooltip : {
 				visible : true,
-				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#"
+				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
 			}
 		});		
 	}
@@ -206,9 +206,8 @@ var chartref = {};
         shapeCreated: function(e){
           	var shape = e.shape,
        		createdState = shape.dataItem.properties.name;
-       		var stateList = retreiveFormattedStateData(ds.view());
        		if(stateList[createdState]){
-       			shape.options.fill.opacity = stateList[createdState].oilRatio / stateList[createdState].maxOil;
+       			shape.options.fill.opacity = stateList[createdState].oilRatio / maxOil;
        		}
         }
     }).data('kendoMap');
@@ -241,30 +240,12 @@ var chartref = {};
         }],
         shapeCreated: function(e){
           	var shape = e.shape,
-       		createdState = shape.dataItem.properties.name,
-       		stateList = retreiveFormattedStateData(ds.view());
+       		createdState = shape.dataItem.properties.name;
        		if(stateList[createdState]){
-       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / stateList[createdState].maxOilDays;
+       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / maxOilDays;
        		}
      }}).data('kendoMap');	
 	dayson.resize();
-	}
-
-	function toggleMaps(){
-		var wellMap = $('#wellsMap').data('kendoMap'),
-		dayson = $('#daysOnMap').data('kendoMap'),
-		wellLayer = wellMap.layers,
-		daysonLayer = dayson.layers; 
-
-		wellLayer[0].options.style.fill.color = 'blue';
-		daysonLayer[0].options.style.fill.color = 'green';
-
-		wellMap.setOptions({
-			layers: wellLayer
-		});
-		daysonLayer.setOptions({
-			layers: daysonLayer
-		});		
 	}
 	
 	function initTable(JSONData){
@@ -405,7 +386,7 @@ var chartref = {};
 			},
 			tooltip : {
 				visible : true,
-				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#"
+				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
 			}
 		});	
 		wellLines.resize();
@@ -451,11 +432,7 @@ var chartref = {};
 			series: [{data:oilSeries}],
 			tooltip: {
 				visible: true
-			},
-			legend : {
-				position : "left",
-				visible : true
-			},
+			}
 			
 		});	
 
@@ -471,11 +448,7 @@ var chartref = {};
 			series: [{data:gasSeries}],
 			tooltip: {
 				visible: true
-			},
-			legend : {
-				position : "left",
-				visible : true
-			},
+			}
 			
 		});	
 		$("#daysOnOilPieChart").kendoChart({
@@ -489,11 +462,7 @@ var chartref = {};
 			series: [{data:oilDaysOnSeries}],
 			tooltip: {
 				visible: true
-			},
-			legend : {
-				position : "left",
-				visible : true
-			},
+			}
 			
 		});	
 		
@@ -509,11 +478,7 @@ var chartref = {};
 			series: [{data:gasDaysOnSeries}],
 			tooltip: {
 				visible: true
-			},
-			legend : {
-				position : "left",
-				visible : true
-			},
+			}
 		});	
 	}
 	
@@ -722,16 +687,6 @@ var chartref = {};
 }());
 //begin modal events 
 (function() {
-    utils.constants = {
-        XML_OPEN_TAG: '<?xml version="1.0" encoding="UTF-8"?>\n',
-        OPEN_TAG: '<',
-        END_TAG: '>',
-        FORWARD_SLASH: '/',
-        ROW: 'row_',
-        NEW_LINE: '\n',
-        TAB: '\t'
-
-    };	
     //create utility functions
     utils.gridJson2Xml = function(obj) {
         var xml = '';
@@ -770,11 +725,14 @@ var chartref = {};
         element.click();
         document.body.removeChild(element);
     };
+    utils.validateFilename = function(filename){
+    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
+    	return regex.test(filename);
+    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
             	$filenameInput = $('#modal').find('#filename'), 
-            	$grid = $('#table').data('kendoGrid'),
                 userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
@@ -784,16 +742,19 @@ var chartref = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
+                if(!utils.validateFilename(saveFileName)){
+                	saveFileName += '.' + fileType;
+                }
             switch (true) {
                 case fileType === exportType.JSON:
-                    var gridJSON = $grid.dataSource.view(); //filtered datasource
+                    var gridJSON = DOE.database.view(); //filtered datasource
                     utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
                     break;
                 case fileType === exportType.EXCEL:
                     $grid.saveAsExcel();
                     break;
                 case fileType === exportType.XML:
-                    var gridJSON = $grid.dataSource.view(), //filtered datasource
+                    var gridJSON = DOE.database.view(); //filtered datasource
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
                     break;
