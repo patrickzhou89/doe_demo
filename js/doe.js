@@ -307,6 +307,11 @@ var chartref = {};
 					format : "{0}"
 				}
 			},
+			categoryAxis: {
+				labels: {
+					rotation: 90
+				}								
+			},
 			tooltip : {
 				visible : true
 			}
@@ -339,6 +344,11 @@ var chartref = {};
 					format : "yyyy",
 					rotation : 315
 				}
+			},
+			categoryAxis: {
+				labels: {
+					rotation: 90
+				}								
 			},
 			tooltip : {
 				visible : true,
