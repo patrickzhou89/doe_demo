@@ -317,6 +317,7 @@ var utils = {};
 		dsRegistry.push(pieChartWellsDatasource);
 		
 		$("#wellsOilPieChart").kendoChart({
+			theme: THEME,
 			title : {
 				text : "Oil Wells per Rate Class"
 			},
@@ -332,6 +333,7 @@ var utils = {};
 		});	
 		registerDataSource($("#wellsOilPieChart").data('kendoChart').dataSource);
 		$("#wellsGasPieChart").kendoChart({
+			theme: THEME,
 			title : {
 				text : "Gas Wells per Rate Class"
 			},
@@ -348,6 +350,7 @@ var utils = {};
 		});	
 		
 		$("#daysOnOilPieChart").kendoChart({
+			theme: THEME,
 			title : {
 				text : "Oil Days On per Rate Class"
 			},
@@ -363,6 +366,7 @@ var utils = {};
 		});	
 		
 		$("#daysOnGasPieChart").kendoChart({
+			theme: THEME,
 			title : {
 				text : "Gas Days On per Rate Class"
 			},

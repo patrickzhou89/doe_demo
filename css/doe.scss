@@ -170,7 +170,8 @@ html,body{
     display:none;
 }
 #map{
-    display:none;
+    display:block;
+    width:100%;
 }
 #barChart{
     display:none;
@@ -182,6 +183,7 @@ html,body{
     display:inline-block;
     position:static !important;
     height: 600px;
+    display:none;
 }
 .modal-row{
     label{
@@ -195,6 +197,9 @@ html,body{
         padding:5px;
         width:388px;
     }
+}
+#wellsMap{
+    height:600px;
 }
 #modal-actions{
     text-align:right;
