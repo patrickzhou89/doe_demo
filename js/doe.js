@@ -2,38 +2,38 @@ var DOE = {};
 var utils = {};
 (function() {
 	
-	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
+	var THEME = 'material';
+	
+	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass',
+		GAS_WELLS_DAYS_ON = 'gasWellsDayson', NUM_GAS_WELLS = 'numGasWells',
+		OIL_WELLS_DAYS_ON = 'oilWellsDayson', NUM_OIL_WELLS = 'numOilWells',
+		GAS = 'gas', OIL = 'oil';
 	
 	var alwaysTrue = _.constant(true);
 	
 	var DOEData = null;
 	var DOEStateMap = null;
 	
-	/*
-	var database = DOE.database = new kendo.data.DataSource({
-		transport: {
-			read: 'data/states.json'
-		},
-		//schema: { model: DataModel },
-		filter: {
-			logic: 'and',
-			filters: [
-				{ field: STATE, operator: alwaysTrue },
-				{ field: PROD_YEAR, operator: alwaysTrue },
-				{ field: RATE_CLASS, operator: alwaysTrue }
-			]
-		}
-	});
-	
-	var databaseReadPromise = database.read();
-	*/
-	
 	var dsRegistry = DOE.dsRegistry = [];
 	
-	function filterDatabase(field, event) {
-		return; // TODO: fix this
+	var defaultFilters = {
+		logic: 'and',
+		filters: [
+			{ field: STATE, operator: alwaysTrue },
+			{ field: PROD_YEAR, operator: alwaysTrue },
+			{ field: RATE_CLASS, operator: alwaysTrue }
+		]
+	};
+	
+	function registerDataSource(ds) {
+		ds.filter(defaultFilters);
+		ds.read();
+		dsRegistry.push(ds);
+	}
+	
+	function filterDataSource(ds, field, event) {
 		var values = event.sender.value(),
-			newFilter = database.filter();
+			newFilter = ds.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
 			isProdYear = field === PROD_YEAR;
 		if (values.length === 0) {
@@ -53,16 +53,59 @@ var utils = {};
 				return values.indexOf(value) >= 0;
 			};			
 		}
+		ds.filter(newFilter);
+	}
+		
+	function applyFilters(field, event) {
 		_.each(dsRegistry, function(ds) {
-			ds.filter(newFilter);			
+			filterDataSource(ds, field, event);
 		});
 	}
 	
 	function initCharts(JSONData) {
+		initBarCharts(JSONData);
 		initLineChart(JSONData);
 		initPieChart(JSONData);	
 		initTable(JSONData);
 	}
+	
+	function initBarCharts(JSONData) {
+		$("#wellsBarChart").kendoChart({
+			theme: THEME,
+			dataSource: JSONData, 
+			seriesDefaults: { 
+				categoryField : 'rateClass',
+				aggregate : "sum",
+				type: "column" 
+			},
+			series: [{
+				name: 'Number of Gas Wells',
+				field: 'numGasWells' 
+			}, {
+				name: 'Number of Oil Wells',
+				field: 'numOilWells' 
+			}]
+		});		
+		registerDataSource($("#wellsBarChart").data('kendoChart').dataSource);
+		$("#daysOnBarChart").kendoChart({
+			theme: THEME,
+			dataSource: JSONData,
+			seriesDefaults: { 
+				categoryField : 'rateClass',
+				aggregate : "sum",
+				type: "column" 
+			},
+			series: [{
+				name: 'Gas Wells Days On',
+				field: 'gasWellsDayson' 
+			}, {
+				name: 'Oil Well Days On',
+				field: 'oilWellsDayson' 
+			}]
+		});		
+		registerDataSource($("#daysOnBarChart").data('kendoChart').dataSource);
+	}
+	
 	function initMaps(JSONdata){
 	$('#wellsMap').kendoMap({
     	center: [39.5, -120],
@@ -160,7 +203,7 @@ var utils = {};
 			]
 		});
 		
-		
+		registerDataSource($("#table").data('kendoGrid').dataSource);
 	}
 	
 	function initLineChart(JSONData){
@@ -287,7 +330,7 @@ var utils = {};
 			}
 			
 		});	
-		
+		registerDataSource($("#wellsOilPieChart").data('kendoChart').dataSource);
 		$("#wellsGasPieChart").kendoChart({
 			title : {
 				text : "Gas Wells per Rate Class"
@@ -332,8 +375,8 @@ var utils = {};
 			tooltip: {
 				visible: true
 			}
-			
 		});	
+		registerDataSource($("#wellsGasPieChart").data('kendoChart').dataSource);
 	}
 	
 	function initFiltering(JSONData) {
@@ -405,7 +448,7 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.firstFilter.filterType, event);
+					applyFilters(this.firstFilter.filterType, event);
 				}
 			},
 			secondFilter: {
@@ -446,7 +489,7 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.secondFilter.filterType, event);
+					applyFilters(this.secondFilter.filterType, event);
 				}
 			},
 			thirdFilter: {
@@ -465,7 +508,7 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.thirdFilter.filterType, event);
+					applyFilters(this.thirdFilter.filterType, event);
 				}
 			}
 		};
@@ -574,43 +617,7 @@ var utils = {};
 			$("#pieChart, #map, #lineChart, #barChart").hide();
         },
         loadExportView: function() {
-            var $modal = $('#modal').kendoWindow({
-                modal: true,
-                height: '40%',
-                width: '30%',
-                draggable: false,
-                pinned: true,
-                resizable: false,
-                activate: function() {
-                    this.wrapper.find('div.k-header').hide();
-                    this.wrapper.find('input#export-type').kendoDropDownList({
-                        dataSource: [{
-                            fileType: 'Spreadsheet (xlsx)',
-                            ext: 'excel'
-                        }, {
-                            fileType: 'Spreadsheet (csv)',
-                            ext: 'excel_csv'
-                        }, {
-                            fileType: 'PDF',
-                            ext: 'pdf'
-                        }, {
-                            fileType: 'JSON',
-                            ext: 'json'
-                        }, {
-                            fileType: 'XML',
-                            ext: 'xml'
-                        }],
-                        dataTextField: 'fileType',
-                        dataValueField: 'ext',
-                    });
-                },
-                close: function(){
-                	//reset filename field
-                	console.log(this.wrapper)
-                	this.wrapper.find('#filename').val('');
-                }
-            }).data('kendoWindow');
-            $modal.open().center();
+        	$modal.open().center();
         }
     };
     kendo.bind($('#sidebar'), kendo.observable(sideBar));
@@ -655,14 +662,11 @@ var utils = {};
         element.click();
         document.body.removeChild(element);
     };
-    utils.validateFilename = function(filename){
-    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
-    	return regex.test(filename);
-    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
             	$filenameInput = $('#modal').find('#filename'), 
+            	$grid = $('#table').data('kendoGrid'),
                 userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
@@ -672,10 +676,6 @@ var utils = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
-                console.log(utils.validateFilename(saveFileName));
-                if(!utils.validateFilename(saveFileName)){
-                	saveFileName += '.' + fileType;
-                }
             switch (true) {
                 case fileType === exportType.JSON:
                     var gridJSON = DOE.database.view(); //filtered datasource
