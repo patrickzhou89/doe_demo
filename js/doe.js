@@ -1,40 +1,47 @@
 var DOE = {};
 var utils = {};
+var chartref = {};
 (function() {
 	
-	var THEME = 'material';
-	
-	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass',
-		GAS_WELLS_DAYS_ON = 'gasWellsDayson', NUM_GAS_WELLS = 'numGasWells',
-		OIL_WELLS_DAYS_ON = 'oilWellsDayson', NUM_OIL_WELLS = 'numOilWells',
-		GAS = 'gas', OIL = 'oil';
+	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
 	
 	var alwaysTrue = _.constant(true);
 	
 	var DOEData = null;
 	var DOEStateMap = null;
 	
+	/*
+	var database = DOE.database = new kendo.data.DataSource({
+		transport: {
+			read: 'data/states.json'
+		},
+		//schema: { model: DataModel },
+		filter: {
+			logic: 'and',
+			filters: [
+				{ field: STATE, operator: alwaysTrue },
+				{ field: PROD_YEAR, operator: alwaysTrue },
+				{ field: RATE_CLASS, operator: alwaysTrue }
+			]
+		}
+	});
+	
+	var databaseReadPromise = database.read();
+	*/
+	
 	var dsRegistry = DOE.dsRegistry = [];
 	
-	var defaultFilters = {
-		logic: 'and',
-		filters: [
-			{ field: STATE, operator: alwaysTrue },
-			{ field: PROD_YEAR, operator: alwaysTrue },
-			{ field: RATE_CLASS, operator: alwaysTrue }
-		]
-	};
-	
-	function registerDataSource(ds) {
-		ds.filter(defaultFilters);
-		ds.read();
-		dsRegistry.push(ds);
-	}
-	
-	function filterDataSource(ds, field, event) {
+	function filterDatabase(field, event) {
+		return; // TODO: fix this
 		var values = event.sender.value(),
+<<<<<<< HEAD
 			newFilter = ds.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field });
+=======
+			newFilter = database.filter();
+			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
+			isProdYear = field === PROD_YEAR;
+>>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;
 		} else {
@@ -42,21 +49,17 @@ var utils = {};
 				return values.indexOf(value) >= 0;
 			};			
 		}
-		ds.filter(newFilter);
-	}
-		
-	function applyFilters(field, event) {
 		_.each(dsRegistry, function(ds) {
-			filterDataSource(ds, field, event);
+			ds.filter(newFilter);			
 		});
 	}
 	
 	function initCharts(JSONData) {
-		initBarCharts(JSONData);
 		initLineChart(JSONData);
 		initPieChart(JSONData);	
 		initTable(JSONData);
 	}
+<<<<<<< HEAD
 	
 	function initBarCharts(JSONData) {
 		$("#wellsBarChart").kendoChart({
@@ -97,11 +100,12 @@ var utils = {};
 		registerDataSource($("#daysOnBarChart").data('kendoChart').dataSource);
 	}
 	
+=======
+>>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 	function initMaps(JSONdata){
-	$('#wellsMap').kendoMap({
+	var wellmap = $('#wellsMap').kendoMap({
     	center: [39.5, -120],
         zoom: 4,
-        minSize: 300,
         controls:{
           	attribution: false,
            	navigator: false,
@@ -149,7 +153,9 @@ var utils = {};
             		// console.log('shape:', shape);
        		shape.options.fill.opacity = (stateOilTotal / oilSumTotal) * 100;
             }
-         });				
+         }).data('kendoMap');		
+
+		wellmap.resize();
 	}
 	
 	function initTable(JSONData){
@@ -193,12 +199,11 @@ var utils = {};
 				{ field: "gasWellsDayson", title: "# of Days Gas Wells On" }
 			]
 		});
-		
-		registerDataSource($("#table").data('kendoGrid').dataSource);
 	}
 	
 	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
+<<<<<<< HEAD
 			schema : {
 				model : {
 					fields : {
@@ -209,26 +214,44 @@ var utils = {};
 					}
 				}
 			},
+=======
+>>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 			data: JSONData,
-			group : {
-				field : "state"
+			group:{
+				field: "rateClass",
+				aggregates: [{ field: "numOilWells", aggregate: "sum" },
+				{field: "numGasWells", aggregate: "sum" },
+				{ field: "oilWellsDayson", aggregate: "sum" },
+				{ field: "gasWellsDayson", aggregate: "sum" }]
 			}});
-		$("#lineChart").kendoChart({
-			theme: THEME,
+		lineChartDatasource.read();
+		
+		var oilWellSeries = [],
+		gasWellSeries = [],
+		gasDaysOnSeries = [],
+		oilDaysOnSeries = [],
+		categories = [],
+		items = lineChartDatasource.view(),
+		length = items.length,
+		item;
+		//create the chart series  
+		for (var i = 0; i < length; i++) {
+			item = items[i];
+			categories.push(items[i].value);
+			oilWellSeries.push({type : "line",name: "Oil Wells", category: item.value, value: item.aggregates.numOilWells.sum});
+			gasWellSeries.push({type : "line",name: "Gas Wells", category: item.value, value: item.aggregates.numGasWells.sum});
+			gasDaysOnSeries.push({type : "line",name: "Gas Days On", category: item.value, value: item.aggregates.oilWellsDayson.sum});
+			oilDaysOnSeries.push({type : "line",name: "Oil Days On", category: item.value, value: item.aggregates.gasWellsDayson.sum});
+		}
+		
+		dsRegistry.push(lineChartDatasource);
+		$("#daysOnLineChart").kendoChart({
 			title : {
-				text : "Wells Per State"
+				text : "Days On per Rate Class"
 			},
 			theme:"material",
 			dataSource : lineChartDatasource,
-			series : [ {
-				type : "line",
-				field : "numOilWells",
-				categoryField : 'prodYear',
-				name : "#= group.value #",
-				aggregate : "sum",
-				padding : 10, 
-				colorField: 'color'
-			} ],
+			series : [gasDaysOnSeries, oilDaysOnSeries ],
 			legend : {
 				position : "bottom",
 				visible : true
@@ -238,52 +261,63 @@ var utils = {};
 					format : "{0}"
 				}
 			},
-			categoryAxis : {
-				field : "prodYear",
-				baseUnit : "fit",
-				type : 'date',
-				labels : {
-					format : "yyyy",
-					rotation : 315
-				}
+			categoryAxis: {
+				categories:categories
 			},
 			tooltip : {
-				visible : true,
-				template : "State: #= series.name #: #= value #"
+				visible : true
 			}
 		});	
-		registerDataSource($("#lineChart").data('kendoChart').dataSource);
+		
+		$("#wellsLineChart").kendoChart({
+			title : {
+				text : "Wells per Rate Class"
+			},
+			theme:"material",
+			dataSource : lineChartDatasource,
+			series : [oilWellSeries, gasWellSeries ],
+			legend : {
+				position : "bottom",
+				visible : true
+			},
+			valueAxis : {
+				labels : {
+					format : "{0}"
+				}
+			},
+			categoryAxis: {
+				categories:categories
+			},
+			tooltip : {
+				visible : true
+			}
+		});
 	}
 	
 	
 	function initPieChart(JSONData){
-		var pieChartWellsDatasource = new kendo.data.DataSource({
+		var pieChartDatasource = new kendo.data.DataSource({
 			data: JSONData,
 			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
 			group:{field: "rateClass",
 				aggregates: [{ field: "numOilWells", aggregate: "sum" },
-				{ field: "numGasWells", aggregate: "sum" },
-					{ field: "oilWellsDayson", aggregate: "sum" },
-				{ field: "gasWellsDayson", aggregate: "sum" }]
+				{ field: "numGasWells", aggregate: "sum" }]
 			}
 		});
-		pieChartWellsDatasource.read();
-		var oilWellSeries = [],
-		gasWellSeries = [],
-		gasDaysOnSeries = [],
-		oilDaysOnSeries = [],
-		items = pieChartWellsDatasource.view(),
+		pieChartDatasource.read();
+		
+		var oilSeries = [],
+		gasSeries = [],
+		items = pieChartDatasource.view(),
 		length = items.length,
 		item;
 		//create the chart series  
 		for (var i = 0; i < length; i++) {
 			item = items[i];
-			oilWellSeries.push({ category: item.value, value: item.aggregates.numOilWells.sum});
-			gasWellSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum});
-			gasDaysOnSeries.push({ category: item.value, value: item.aggregates.oilWellsDayson.sum});
-			oilDaysOnSeries.push({ category: item.value, value: item.aggregates.gasWellsDayson.sum});
+			oilSeries.push({ category: item.value, value: item.aggregates.numOilWells.sum});
+			gasSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum})
 		}
-		dsRegistry.push(pieChartWellsDatasource);
+		dsRegistry.push(pieChartDatasource);
 		
 		$("#wellsOilPieChart").kendoChart({
 			theme: THEME,
@@ -293,14 +327,14 @@ var utils = {};
 			seriesDefaults: {
 				type: "pie"
 			},
-			dataSource : pieChartWellsDatasource,
-			series: [{data:oilWellSeries}],
+			dataSource : pieChartDatasource,
+			series: [{data:oilSeries}],
 			tooltip: {
 				visible: true
 			}
 			
 		});	
-		registerDataSource($("#wellsOilPieChart").data('kendoChart').dataSource);
+		
 		$("#wellsGasPieChart").kendoChart({
 			theme: THEME,
 			title : {
@@ -310,8 +344,8 @@ var utils = {};
 			seriesDefaults: {
 				type: "pie"
 			},
-			dataSource : pieChartWellsDatasource,
-			series: [{data:gasWellSeries}],
+			dataSource : pieChartDatasource,
+			series: [{data:gasSeries}],
 			tooltip: {
 				visible: true
 			}
@@ -415,7 +449,7 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					applyFilters(this.firstFilter.filterType, event);
+					filterDatabase(this.firstFilter.filterType, event);
 				}
 			},
 			secondFilter: {
@@ -439,8 +473,30 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					applyFilters(this.secondFilter.filterType, event);
+					filterDatabase(this.secondFilter.filterType, event);
 				}
+<<<<<<< HEAD
+=======
+			},
+			thirdFilter: {
+				filterTypeSource: new kendo.data.DataSource({
+					data: filterTypes
+				}),
+				filterTypeSelect: function(event) {
+					var self = this,
+						dataItem = event.sender.dataItem(event.item),
+						field = dataItem.field;
+					self.thirdFilter.set('filterType', field);
+					self.thirdFilter.set('dataSource', dataSourceMap[field]);
+					self.refreshFilters();
+				},
+				filterType: null,
+				dataSource: emptyDataSource,
+				filter: null,
+				filterChange: function(event) {
+					filterDatabase(this.thirdFilter.filterType, event);
+				}
+>>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 			}
 		};
 		kendo.bind($('#filters'), kendo.observable(filtering));
@@ -454,7 +510,7 @@ var utils = {};
 				DOE.data = DOEData = result;
 				kendo.ui.progress($('html'), false);
 				initFiltering(DOEData);
-				initCharts(DOEData);
+				initCharts(DOEData);					
 				initMaps(DOEData);					
 			});
 		$.get('data/states_hash.json', {}, 
@@ -464,7 +520,7 @@ var utils = {};
 	}
 	
 	$(init);
-	
+
 }());
 
 
@@ -523,18 +579,22 @@ var utils = {};
         loadMap: function() {
         	var $map = $("#wellsMap"),
         		mapData = $map.data('kendoMap'),
-        		$dataVizContaienr = $('#data-visulizer');
-
+        		$dataVizContainer = $('#data-visualizer');
+    		$("#map").show();
 			$("#lineChart, #pieChart, #barChart, #table").hide();
-			$map.css({display: 'block', width:$dataVizContaienr.outerWidth()});
-			mapData.resize(); //force redraw to fit to container
-			mapData.scroller.enabled = false; //disable scrolling
         },
         loadPieChart: function() {
+        	if(chartref['pie']){
+        		chartref['pie'].resize();
+        	}
 			$("#pieChart").show();
 			$("#lineChart, #map, #barChart, #table").hide();
+        	
         },
         loadLineChart: function() {
+        	if(chartref['line']){
+        		chartref['line'].resize();
+        	}
         	$("#lineChart").show();
 			$("#pieChart, #map, #barChart, #table").hide();
         },
@@ -547,7 +607,7 @@ var utils = {};
 			$("#pieChart, #map, #lineChart, #barChart").hide();
         },
         loadExportView: function() {
-        	$modal.open().center();
+            $('#modal').data('kendoWindow').open().center();
         }
     };
     kendo.bind($('#sidebar'), kendo.observable(sideBar));
@@ -592,11 +652,14 @@ var utils = {};
         element.click();
         document.body.removeChild(element);
     };
+    utils.validateFilename = function(filename){
+    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
+    	return regex.test(filename);
+    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
             	$filenameInput = $('#modal').find('#filename'), 
-            	$grid = $('#table').data('kendoGrid'),
                 userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
@@ -606,6 +669,10 @@ var utils = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
+                console.log(utils.validateFilename(saveFileName));
+                if(!utils.validateFilename(saveFileName)){
+                	saveFileName += '.' + fileType;
+                }
             switch (true) {
                 case fileType === exportType.JSON:
                     var gridJSON = DOE.database.view(); //filtered datasource

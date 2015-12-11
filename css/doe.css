@@ -143,6 +143,7 @@ html, body {
   height: 100%;
   position: absolute;
   right: 0;
+  top: 0;
   border-left: 1px solid #e7e7e7;
   box-shadow: 0px 1px 4px #666;
   z-index: 10; }
@@ -199,30 +200,10 @@ html, body {
   margin: 10px;
   padding: 10px; }
 
+.k-widget.k-window {
+  padding: 15px !important; }
+
+.k-window-content.k-content {
+  padding: 0 !important; }
+
 /*# sourceMappingURL=doe.css.map */
-
-
-#data-visulizer{
-	width:50%;
-	margin: auto;
-		
-}
-
-#table{
-		display:none;
-}
-#map{
-		display:none;
-}
-#barChart{
-	display:inline-block;
-	height: 600px;
-	width:100%;
-	margin: auto;
-}
-#pieChart{
-		display:none;
-}
-#lineChart{
-	display:none;
-}

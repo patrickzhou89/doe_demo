@@ -62,28 +62,9 @@ html,body{
 #header{
     width:100%;
     height:$header_height;
-    background: #013A55;
+    background: linear-gradient(#8dcf00,#89c800);
     box-shadow: 0 2px 5px #666;
     margin-bottom:1px;
-}
-#eia-logo-wrapper{
-    display:inline-block;
-    *{
-        display:inline-block;
-        vertical-align:middle;
-    }
-}
-#eia-logo{
-    height:48px;
-    margin:4px 0 0 10px;
-}
-#eia-text{
-    color:#fff;
-    font-size:20px;
-    font-family:serif;
-    line-height:110%;
-    margin: 4px 0 0 8px;
-    letter-spacing:0.5px;
 }
 #menu-wrapper{
     float:right; 
@@ -107,7 +88,6 @@ html,body{
     top:25%;
     box-shadow: 2px 0px 5px #666;
     margin:-1px 0 0 0;
-    z-index:10;
     >ul{
         >li{
             text-align:center;
@@ -153,25 +133,18 @@ html,body{
     top:0;
     border-left:1px solid #e7e7e7;
     box-shadow: 0px 1px 4px #666;
-    z-index:10;
 }
 #data-visualizer{
-    text-align:center;
-    padding:5px 0 0 0;
-    height:99%;
-    >div{
-        width:90%;
-        position:static;
-        margin:auto;
-        height:600px;
-    }
+    height:100%;
+    width:80%;
+    position:static;
+    margin:auto;
 }
 #table{
     display:none;
 }
 #map{
-    display:block;
-    width:100%;
+    display:none;
 }
 #barChart{
     display:none;
@@ -181,42 +154,13 @@ html,body{
 }
 #lineChart{
     display:inline-block;
-    position:static !important;
     height: 600px;
-    display:none;
-}
-.modal-row{
-    label{
-        display: block;
-        font-size:14px;
-        font-weight:bold;
-        padding: 0 0 2px 0;
-        margin: 5px 0;
-    }
-    input{
-        padding:5px;
-        width:388px;
-    }
-}
-#wellsMap{
-    height:600px;
-}
-#modal-actions{
-    text-align:right;
-    button{
-        margin-left:5px;
-    }
-    margin-top:20px;
+    width:100%;
+    margin: auto;
 }
 .filter-section {
     margin: 10px;
     padding: 10px;
-}
-.k-widget.k-window{
-    padding:15px !important;
-}
-.k-window-content.k-content{
-    padding:0 !important;
 }
 h1{
     
