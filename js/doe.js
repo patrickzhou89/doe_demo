@@ -312,7 +312,7 @@ var chartref = {};
 			}
 		});	
 		
-		$("#wellsLineChart").kendoChart({
+		var wellLines = ("#wellsLineChart").kendoChart({
 			title : {
 				text : "Wells per Rate Class"
 			},
@@ -345,6 +345,7 @@ var chartref = {};
 				template : "State: #= series.name #: #= value #"
 			}
 		});	
+		wellLines.resize();
 	}
 	
 	
@@ -624,6 +625,9 @@ var chartref = {};
         		chartref['line'].resize();
         	}
         	$("#lineChart").show();
+        	$('#lineChart').children().each(function(){
+        		$(this).data('kendoChart').resize();
+        	})
 			$("#pieChart, #map, #barChart, #table").hide();
         },
         loadBarGraph: function() {
