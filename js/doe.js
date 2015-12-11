@@ -133,8 +133,7 @@ var chartref = {};
 			}
 		});		
 	}
-	
-	function initMaps(JSONdata){
+	function retreiveFormattedStateData(JSONData){
 		var numOilSum=0,numGasSum=0, numOilDaysSum=0,numGasDaysSum=0,maxOil=0,maxGas=0, maxOilDays=0, maxGasDays=0, stateList={};
    		$.each(DOEData, function(){
    			state=DOEStateMap[this.state];
@@ -177,7 +176,24 @@ var chartref = {};
    			this['oilRatio']=oilWellRatio;
    			this['gasDaysOnRatio']=gasWellDaysOnRatio;
    			this['oilDaysOnRatio']=oilWellDaysOnRatio;
-   		})
+   			this['maxOil']=maxOil;
+   			this['maxOilDays']=maxOilDays;
+   		});
+   		return stateList;
+	}
+	function initMaps(JSONdata){
+		var ds = new kendo.data.DataSource({
+			data: JSONdata,
+			change: function(e){
+				var $dayson = $('#daysOnMap').data('kendoMap'),
+					$wellsMap = $('#wellsMap').data('kendoMap');
+				if($dayson && $dayson){
+					$dayson.setOptions({});
+					$wellsMap.setOptions({});
+				}
+			}
+		});
+		registerDataSource(ds);		
 	var wellmap = $('#wellsMap').kendoMap({
     	center: [38.5, -90],
         zoom: 4,

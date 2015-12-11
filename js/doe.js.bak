@@ -177,7 +177,24 @@ var chartref = {};
    			this['oilRatio']=oilWellRatio;
    			this['gasDaysOnRatio']=gasWellDaysOnRatio;
    			this['oilDaysOnRatio']=oilWellDaysOnRatio;
-   		})
+   			this['maxOil']=maxOil;
+   			this['maxOilDays']=maxOilDays;
+   		});
+   		return stateList;
+	}
+	function initMaps(JSONdata){
+		var ds = new kendo.data.DataSource({
+			data: JSONdata,
+			change: function(e){
+				var $dayson = $('#daysOnMap').data('kendoMap'),
+					$wellsMap = $('#wellsMap').data('kendoMap');
+				if($dayson && $dayson){
+					$dayson.setOptions({});
+					$wellsMap.setOptions({});
+				}
+			}
+		});
+		registerDataSource(ds);		
 	var wellmap = $('#wellsMap').kendoMap({
     	center: [38.5, -90],
         zoom: 4,
@@ -206,8 +223,9 @@ var chartref = {};
         shapeCreated: function(e){
           	var shape = e.shape,
        		createdState = shape.dataItem.properties.name;
+       		var stateList = retreiveFormattedStateData(ds.view());
        		if(stateList[createdState]){
-       			shape.options.fill.opacity = stateList[createdState].oilRatio / maxOil;
+       			shape.options.fill.opacity = stateList[createdState].oilRatio / stateList[createdState].maxOil;
        		}
         }
     }).data('kendoMap');
@@ -240,12 +258,30 @@ var chartref = {};
         }],
         shapeCreated: function(e){
           	var shape = e.shape,
-       		createdState = shape.dataItem.properties.name;
+       		createdState = shape.dataItem.properties.name,
+       		stateList = retreiveFormattedStateData(ds.view());
        		if(stateList[createdState]){
-       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / maxOilDays;
+       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / stateList[createdState].maxOilDays;
        		}
      }}).data('kendoMap');	
 	dayson.resize();
+	}
+
+	function toggleMaps(){
+		var wellMap = $('#wellsMap').data('kendoMap'),
+		dayson = $('#daysOnMap').data('kendoMap'),
+		wellLayer = wellMap.layers,
+		daysonLayer = dayson.layers; 
+
+		wellLayer[0].options.style.fill.color = 'blue';
+		daysonLayer[0].options.style.fill.color = 'green';
+
+		wellMap.setOptions({
+			layers: wellLayer
+		});
+		daysonLayer.setOptions({
+			layers: daysonLayer
+		});		
 	}
 	
 	function initTable(JSONData){
@@ -687,6 +723,16 @@ var chartref = {};
 }());
 //begin modal events 
 (function() {
+    utils.constants = {
+        XML_OPEN_TAG: '<?xml version="1.0" encoding="UTF-8"?>\n',
+        OPEN_TAG: '<',
+        END_TAG: '>',
+        FORWARD_SLASH: '/',
+        ROW: 'row_',
+        NEW_LINE: '\n',
+        TAB: '\t'
+
+    };	
     //create utility functions
     utils.gridJson2Xml = function(obj) {
         var xml = '';
@@ -725,14 +771,11 @@ var chartref = {};
         element.click();
         document.body.removeChild(element);
     };
-    utils.validateFilename = function(filename){
-    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
-    	return regex.test(filename);
-    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
             	$filenameInput = $('#modal').find('#filename'), 
+            	$grid = $('#table').data('kendoGrid'),
                 userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
@@ -742,19 +785,16 @@ var chartref = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
-                if(!utils.validateFilename(saveFileName)){
-                	saveFileName += '.' + fileType;
-                }
             switch (true) {
                 case fileType === exportType.JSON:
-                    var gridJSON = DOE.database.view(); //filtered datasource
+                    var gridJSON = $grid.dataSource.view(); //filtered datasource
                     utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
                     break;
                 case fileType === exportType.EXCEL:
                     $grid.saveAsExcel();
                     break;
                 case fileType === exportType.XML:
-                    var gridJSON = DOE.database.view(); //filtered datasource
+                    var gridJSON = $grid.dataSource.view(), //filtered datasource
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
                     break;
