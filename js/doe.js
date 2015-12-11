@@ -165,37 +165,42 @@ var chartref = {};
 	
 	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
-			schema : {
-				model : {
-					fields : {
-						prodYear : {type : 'date'},
-						state : {type : 'string'},
-						rateClass : {type : 'number'},
-						numOilWells : {type : 'number'}	
-					}
-				}
-			},
 			data: JSONData,
-			group : {
-				field : "state"
+			group:{
+				field: "rateClass",
+				aggregates: [{ field: "numOilWells", aggregate: "sum" },
+				{field: "numGasWells", aggregate: "sum" },
+				{ field: "oilWellsDayson", aggregate: "sum" },
+				{ field: "gasWellsDayson", aggregate: "sum" }]
 			}});
 		lineChartDatasource.read();
+		
+		var oilWellSeries = [],
+		gasWellSeries = [],
+		gasDaysOnSeries = [],
+		oilDaysOnSeries = [],
+		categories = [],
+		items = lineChartDatasource.view(),
+		length = items.length,
+		item;
+		//create the chart series  
+		for (var i = 0; i < length; i++) {
+			item = items[i];
+			categories.push(items[i].value);
+			oilWellSeries.push({type : "line",name: "Oil Wells", category: item.value, value: item.aggregates.numOilWells.sum});
+			gasWellSeries.push({type : "line",name: "Gas Wells", category: item.value, value: item.aggregates.numGasWells.sum});
+			gasDaysOnSeries.push({type : "line",name: "Gas Days On", category: item.value, value: item.aggregates.oilWellsDayson.sum});
+			oilDaysOnSeries.push({type : "line",name: "Oil Days On", category: item.value, value: item.aggregates.gasWellsDayson.sum});
+		}
+		
 		dsRegistry.push(lineChartDatasource);
-		$("#lineChart").kendoChart({
+		$("#daysOnLineChart").kendoChart({
 			title : {
-				text : "Wells Per State"
+				text : "Days On per Rate Class"
 			},
 			theme:"material",
 			dataSource : lineChartDatasource,
-			series : [ {
-				type : "line",
-				field : "numOilWells",
-				categoryField : 'prodYear',
-				name : "#= group.value #",
-				aggregate : "sum",
-				padding : 10, 
-				colorField: 'color'
-			} ],
+			series : [gasDaysOnSeries, oilDaysOnSeries ],
 			legend : {
 				position : "bottom",
 				visible : true
@@ -205,20 +210,37 @@ var chartref = {};
 					format : "{0}"
 				}
 			},
-			categoryAxis : {
-				field : "prodYear",
-				baseUnit : "fit",
-				type : 'date',
-				labels : {
-					format : "yyyy",
-					rotation : 315
-				}
+			categoryAxis: {
+				categories:categories
 			},
 			tooltip : {
-				visible : true,
-				template : "State: #= series.name #: #= value #"
+				visible : true
 			}
 		});	
+		
+		$("#wellsLineChart").kendoChart({
+			title : {
+				text : "Wells per Rate Class"
+			},
+			theme:"material",
+			dataSource : lineChartDatasource,
+			series : [oilWellSeries, gasWellSeries ],
+			legend : {
+				position : "bottom",
+				visible : true
+			},
+			valueAxis : {
+				labels : {
+					format : "{0}"
+				}
+			},
+			categoryAxis: {
+				categories:categories
+			},
+			tooltip : {
+				visible : true
+			}
+		});
 	}
 	
 	
