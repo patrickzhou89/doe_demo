@@ -264,23 +264,6 @@ var chartref = {};
                 if (stateList[createdState]) {
                     shape.options.fill.opacity = stateList[createdState].oilRatio / stateList[createdState].maxOil;
                 }
-            },
-            shapeMouseEnter: function(e) {
-                var oe = e.originalEvent;
-                var x = oe.pageX || oi.clientX;
-                var y = oe.pageY || oi.clientY;
-
-                var name = e.shape.dataItem.properties.name;
-                popup.element.html(name);
-                popup.open(x, y);
-            },
-            shapeMouseLeave: function(e) {
-                if (!$(e.originalEvent.relatedTarget).is(".k-popup, .k-animation-container")) {
-                    popup.close();
-                    // Necessary to stop the animations,
-                    // will be fixed in future versions
-                    popup.element.kendoStop(true, true);
-                }
             }
         }).data('kendoMap');
 
@@ -317,30 +300,9 @@ var chartref = {};
                 if (stateList[createdState]) {
                     shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / stateList[createdState].maxOilDays;
                 }
-            },
-            shapeMouseEnter: function(e) {
-                var oe = e.originalEvent;
-                var x = oe.pageX || oi.clientX;
-                var y = oe.pageY || oi.clientY;
-
-                var name = e.shape.dataItem.properties.name;
-                popup.element.html(name);
-                popup.open(x, y);
-            },
-            shapeMouseLeave: function(e) {
-                if (!$(e.originalEvent.relatedTarget).is(".k-popup, .k-animation-container")) {
-                    popup.close();
-                    // Necessary to stop the animations,
-                    // will be fixed in future versions
-                    popup.element.kendoStop(true, true);
-                }
             }
         }).data('kendoMap');
         dayson.resize();
-        var popup = $("<div>Foo</div>")
-            .appendTo(document.body)
-            .kendoPopup()
-            .data("kendoPopup");
     }
 
     function toggleMaps() {
