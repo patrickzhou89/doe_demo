@@ -388,7 +388,11 @@ var chartref = {};
 			series: [{data:oilSeries}],
 			tooltip: {
 				visible: true
-			}
+			},
+			legend : {
+				position : "left",
+				visible : true
+			},
 			
 		});	
 
@@ -404,7 +408,11 @@ var chartref = {};
 			series: [{data:gasSeries}],
 			tooltip: {
 				visible: true
-			}
+			},
+			legend : {
+				position : "left",
+				visible : true
+			},
 			
 		});	
 		$("#daysOnOilPieChart").kendoChart({
@@ -418,7 +426,11 @@ var chartref = {};
 			series: [{data:oilDaysOnSeries}],
 			tooltip: {
 				visible: true
-			}
+			},
+			legend : {
+				position : "left",
+				visible : true
+			},
 			
 		});	
 		
@@ -434,7 +446,11 @@ var chartref = {};
 			series: [{data:gasDaysOnSeries}],
 			tooltip: {
 				visible: true
-			}
+			},
+			legend : {
+				position : "left",
+				visible : true
+			},
 		});	
 	}
 	

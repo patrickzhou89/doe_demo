@@ -162,6 +162,7 @@ html,body{
     height:100%;
     width:90%;
     margin:auto;
+    position:relative;
     >div{
         width:100%;
         height:600px;
@@ -170,33 +171,40 @@ html,body{
 }
 #table{
     position:absolute;
-    left:100%;
+    left:120%;
 }
 #map{
-    left:100%;>div{
+    left:120%;>div{
             height:400px;
-            width:95%;
+            width:100%;
         }
 }
 #barChart{
     position:absolute;
-    left:100%;>div{
+    left:120%;>div{
             height:400px;
-            width:95%;
+            width:100%;
         }
 }
 #pieChart{
     position:absolute;
-    left:100%;>div{
+    left:120%;
+    >div{
+        width:95%;
+        display:flex;
+        >div{
             height:400px;
-            width:95%;
+            width:49%;
+            flex:1;
         }
+    }
 }
 #lineChart{
     position:absolute;
-    left:100%;>div{
+    left:120%;
+    >div{
             height:400px;
-            width:95%;
+            width:100%;
         }
 }
 .modal-row{
