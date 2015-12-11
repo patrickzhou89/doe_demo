@@ -195,21 +195,14 @@ var chartref = {};
 				{ field: "gasWellsDayson", title: "# of Days Gas Wells On" }
 			]
 		});
-		//console.log('table', $("#table").data('kendoGrid').dataSource);
 		registerDataSource($("#table").data('kendoGrid').dataSource);
 	}
 	
 	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
-			data: JSONData,
-			group:{
-				field: "rateClass",
-				aggregates: [{ field: "numOilWells", aggregate: "sum" },
-				{field: "numGasWells", aggregate: "sum" },
-				{ field: "oilWellsDayson", aggregate: "sum" },
-				{ field: "gasWellsDayson", aggregate: "sum" }]
-			}});
-		lineChartDatasource.read();
+			data: JSONData
+		});
+		registerDataSource(lineChartDatasource);
 		
 		var oilWellSeries = [],
 		gasWellSeries = [],
@@ -219,23 +212,24 @@ var chartref = {};
 		items = lineChartDatasource.view(),
 		length = items.length,
 		item;
-		//create the chart series  
-		for (var i = 0; i < length; i++) {
-			item = items[i];
-			categories.push(items[i].value);
-			oilWellSeries.push({type : "line",name: "Oil Wells", category: item.value, value: item.aggregates.numOilWells.sum});
-			gasWellSeries.push({type : "line",name: "Gas Wells", category: item.value, value: item.aggregates.numGasWells.sum});
-			gasDaysOnSeries.push({type : "line",name: "Gas Days On", category: item.value, value: item.aggregates.oilWellsDayson.sum});
-			oilDaysOnSeries.push({type : "line",name: "Oil Days On", category: item.value, value: item.aggregates.gasWellsDayson.sum});
-		}
-		
 		$("#daysOnLineChart").kendoChart({
 			title : {
 				text : "Days On per Rate Class"
 			},
-			theme:"material",
+			theme: THEME,
+			seriesDefaults: { 
+				categoryField : 'rateClass',
+				aggregate : "sum",
+				type: "line" 
+			},
 			dataSource : lineChartDatasource,
-			series : [gasDaysOnSeries, oilDaysOnSeries ],
+			series: [{
+				name: 'Gas Wells Days On',
+				field: 'gasWellsDayson' 
+			}, {
+				name: 'Oil Well Days On',
+				field: 'oilWellsDayson' 
+			}],
 			legend : {
 				position : "bottom",
 				visible : true
@@ -244,9 +238,6 @@ var chartref = {};
 				labels : {
 					format : "{0}"
 				}
-			},
-			categoryAxis: {
-				categories:categories
 			},
 			tooltip : {
 				visible : true
@@ -257,20 +248,28 @@ var chartref = {};
 			title : {
 				text : "Wells per Rate Class"
 			},
-			theme:"material",
+			theme: THEME,
 			dataSource : lineChartDatasource,
-			series : [oilWellSeries, gasWellSeries ],
+			seriesDefaults: { 
+				categoryField : 'rateClass',
+				aggregate : "sum",
+				type: "line" 
+			},
 			legend : {
 				position : "bottom",
 				visible : true
 			},
+			series: [{
+				name: 'Number of Gas Wells',
+				field: 'numGasWells' 
+			}, {
+				name: 'Number of Oil Wells',
+				field: 'numOilWells' 
+			}],
 			valueAxis : {
 				labels : {
 					format : "{0}"
 				}
-			},
-			categoryAxis: {
-				categories:categories
 			},
 			tooltip : {
 				visible : true
