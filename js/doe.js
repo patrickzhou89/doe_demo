@@ -173,8 +173,8 @@ var chartref = {};
 					model: {
 						fields: {
 							state: { type: "string" },
-							prodYear: { type: "date" },
-							rateClass: { type: "number" },
+							prodYear: { type: "long" },
+							rateClass: { type: "string" },
 							numOilWells: { type: "number" },
 							oilProdBBL: { type: "number" },
 							oilWellsDayson: { type: "number" },
@@ -196,7 +196,7 @@ var chartref = {};
 			},
 			columns: [
 				{ field: "state", title: "State" },
-				{ field: "prodYear", title: "Production Year", format:"{0:yyyy}" },
+				{ field: "prodYear", title: "Production Year" },
 				{ field: "rateClass", title: "Rate Class"},
 				{ field: "numOilWells", title: "# of Oil Wells" },
 				{ field: "oilProdBBL", title: "Barrels of Oil Produced" },
@@ -295,13 +295,17 @@ var chartref = {};
 			//filter: { field: "prodYear", operator: "gt", value: "01/01/2005" },
 			group:{field: "rateClass",
 				aggregates: [{ field: "numOilWells", aggregate: "sum" },
-				{ field: "numGasWells", aggregate: "sum" }]
+					{ field: "numGasWells", aggregate: "sum" },
+					{ field: "oilWellsDayson", aggregate: "sum" },
+				{ field: "gasWellsDayson", aggregate: "sum" }]
 			}
 		});
 		pieChartDatasource.read();
 		
 		var oilSeries = [],
 		gasSeries = [],
+		gasDaysOnSeries = [],
+		oilDaysOnSeries = [],
 		items = pieChartDatasource.view(),
 		length = items.length,
 		item;
@@ -309,7 +313,9 @@ var chartref = {};
 		for (var i = 0; i < length; i++) {
 			item = items[i];
 			oilSeries.push({ category: item.value, value: item.aggregates.numOilWells.sum});
-			gasSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum})
+			gasSeries.push({ category: item.value, value: item.aggregates.numGasWells.sum});
+			gasDaysOnSeries.push({category: item.value, value: item.aggregates.oilWellsDayson.sum});
+			oilDaysOnSeries.push({category: item.value, value: item.aggregates.gasWellsDayson.sum});
 		}
 		dsRegistry.push(pieChartDatasource);
 		
@@ -351,7 +357,7 @@ var chartref = {};
 			seriesDefaults: {
 				type: "pie"
 			},
-			dataSource : pieChartWellsDatasource,
+			dataSource : pieChartDatasource,
 			series: [{data:oilDaysOnSeries}],
 			tooltip: {
 				visible: true
@@ -367,7 +373,7 @@ var chartref = {};
 			seriesDefaults: {
 				type: "pie"
 			},
-			dataSource : pieChartWellsDatasource,
+			dataSource : pieChartDatasource,
 			series: [{data:gasDaysOnSeries}],
 			tooltip: {
 				visible: true
