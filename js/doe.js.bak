@@ -810,18 +810,19 @@ var chartref = {};
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
                     break;
-                case exportType.PDF:
+                }
+                case exportType.PDF:{
                 	//topkek
                     $("#table").css({'position':'static','margin-top':'1000px'});
                     $grid.saveAsPDF().done(function(){
                    		 $("#table").css({'position':'absolute','margin-top':'0px'});
                     	
                     });
-                    break;
-                default:
+                    break;}
+                default:{
                     console.log('no type found. . .');
                     break;
-                
+                }
             };
         },
         cancelExport: function() {
