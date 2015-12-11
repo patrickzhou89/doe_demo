@@ -211,9 +211,19 @@ html, body {
   #modal-actions button {
     margin-left: 5px; }
 
+#filter-label {
+  margin: 10px 0 0 20px;
+  font-weight: bold;
+  font-size: 20px;
+  display: block; }
+
 .filter-section {
   margin: 10px;
   padding: 10px; }
+  .filter-section .k-widget.k-dropdown.k-header {
+    margin: 0 0 10px 0; }
+  .filter-section input {
+    display: none; }
 
 .k-widget.k-window {
   padding: 15px !important; }
