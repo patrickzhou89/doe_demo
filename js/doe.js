@@ -16,7 +16,7 @@ var chartref = {};
 	var DOEStateMap = null;
 	
 	var dsRegistry = DOE.dsRegistry = [];
-	
+	var $grid;
 	var defaultFilters = {
 		logic: 'and',
 		filters: [
@@ -64,7 +64,7 @@ var chartref = {};
 		registerDataSource(ds);
 		$("#wellsBarChart").kendoChart({
 			theme: THEME,
-			title: 'Wells per Rate Class',
+			title: 'Number of Wells',
 			dataSource: ds, 
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -76,14 +76,9 @@ var chartref = {};
 					rotation: -45
 				}								
 			},
-			valueAxis : {
-				labels : {
-					format: "n0",
-					rotation : 315,
-					padding:{
-						top: 30
-					}
-				}
+			legend:{
+				visible:true,
+				position:'bottom'
 			},
 			series: [{
 				name: 'Number of Gas Wells',
@@ -91,15 +86,11 @@ var chartref = {};
 			}, {
 				name: 'Number of Oil Wells',
 				field: 'numOilWells' 
-			}],
-			tooltip : {
-				visible : true,
-				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
-			}
+			}]
 		});
 		$("#daysOnBarChart").kendoChart({
 			theme: THEME,
-			title: 'Days On per Rate Class',
+			title: 'Well Days On',
 			dataSource: ds,
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -111,14 +102,9 @@ var chartref = {};
 					rotation: -45
 				}								
 			},
-			valueAxis : {
-				labels : {
-					format: "n0",
-					rotation : 315,
-					padding:{
-						top: 30
-					}
-				}
+			legend:{
+				visible:true,
+				position:'bottom'
 			},
 			series: [{
 				name: 'Gas Wells Days On',
@@ -126,11 +112,7 @@ var chartref = {};
 			}, {
 				name: 'Oil Well Days On',
 				field: 'oilWellsDayson' 
-			}],
-			tooltip : {
-				visible : true,
-				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#"
-			}
+			}]
 		});		
 	}
 	
@@ -206,9 +188,8 @@ var chartref = {};
         shapeCreated: function(e){
           	var shape = e.shape,
        		createdState = shape.dataItem.properties.name;
-       		var stateList = retreiveFormattedStateData(ds.view());
        		if(stateList[createdState]){
-       			shape.options.fill.opacity = stateList[createdState].oilRatio / stateList[createdState].maxOil;
+       			shape.options.fill.opacity = stateList[createdState].oilRatio / maxOil;
        		}
         }
     }).data('kendoMap');
@@ -241,34 +222,16 @@ var chartref = {};
         }],
         shapeCreated: function(e){
           	var shape = e.shape,
-       		createdState = shape.dataItem.properties.name,
-       		stateList = retreiveFormattedStateData(ds.view());
+       		createdState = shape.dataItem.properties.name;
        		if(stateList[createdState]){
-       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / stateList[createdState].maxOilDays;
+       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / maxOilDays;
        		}
      }}).data('kendoMap');	
 	dayson.resize();
 	}
-
-	function toggleMaps(){
-		var wellMap = $('#wellsMap').data('kendoMap'),
-		dayson = $('#daysOnMap').data('kendoMap'),
-		wellLayer = wellMap.layers,
-		daysonLayer = dayson.layers; 
-
-		wellLayer[0].options.style.fill.color = 'blue';
-		daysonLayer[0].options.style.fill.color = 'green';
-
-		wellMap.setOptions({
-			layers: wellLayer
-		});
-		daysonLayer.setOptions({
-			layers: daysonLayer
-		});		
-	}
 	
 	function initTable(JSONData){
-		$("#table").kendoGrid({
+		$grid = $("#table").kendoGrid({
 			dataSource: {
 				data: JSONData,
 				schema: {
@@ -327,7 +290,7 @@ var chartref = {};
 		item;
 		$("#daysOnLineChart").kendoChart({
 			title : {
-				text : "Days On per Rate Class"
+				text : "Wells Per State"
 			},
 			theme: THEME,
 			seriesDefaults: { 
@@ -337,10 +300,10 @@ var chartref = {};
 			},
 			dataSource : lineChartDatasource,
 			series: [{
-				name: 'Gas',
+				name: 'Gas Wells Days On',
 				field: 'gasWellsDayson' 
 			}, {
-				name: 'Oil',
+				name: 'Oil Well Days On',
 				field: 'oilWellsDayson' 
 			}],
 			legend : {
@@ -349,20 +312,10 @@ var chartref = {};
 			},
 			valueAxis : {
 				labels : {
-					format: "n0",
-					rotation : 315,
-					padding:{
-						top: 30
-			}
+					format : "{0}"
 				}
 			},
-			categoryAxis: {
-				labels: {
-					rotation: -45
-				}								
-			},
 			tooltip : {
-				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
 				visible : true
 			}
 		});	
@@ -391,21 +344,13 @@ var chartref = {};
 			}],
 			valueAxis : {
 				labels : {
-					format: "n0",
-					rotation : 315,
-					padding:{
-						top: 30
-					}
+					format : "yyyy",
+					rotation : 315
 				}
-			},
-			categoryAxis: {
-				labels: {
-					rotation: -45
-				}								
 			},
 			tooltip : {
 				visible : true,
-				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#"
+				template : "State: #= series.name #: #= value #"
 			}
 		});	
 		wellLines.resize();
@@ -449,14 +394,14 @@ var chartref = {};
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:oilSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				color: 'white'
 			},
-			legend : {
-				position : "left",
-				visible : true
-			},
-			
+			legend:{
+				visible:false
+			}
 		});	
 
 		$("#wellsGasPieChart").kendoChart({
@@ -469,14 +414,14 @@ var chartref = {};
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:gasSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				color: 'white'
 			},
-			legend : {
-				position : "left",
-				visible : true
-			},
-			
+			legend:{
+				visible:false
+			}
 		});	
 		$("#daysOnOilPieChart").kendoChart({
 			title : {
@@ -487,14 +432,14 @@ var chartref = {};
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:oilDaysOnSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				color: 'white'
 			},
-			legend : {
-				position : "left",
-				visible : true
-			},
-			
+			legend:{
+				visible:false
+			}
 		});	
 		
 		$("#daysOnGasPieChart").kendoChart({
@@ -507,13 +452,14 @@ var chartref = {};
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:gasDaysOnSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				color: 'white'
 			},
-			legend : {
-				position : "left",
-				visible : true
-			},
+			legend:{
+				visible:false
+			}
 		});	
 	}
 	
@@ -647,9 +593,6 @@ var chartref = {};
                     fileType: 'Spreadsheet (xlsx)',
                     ext: 'excel'
                 }, {
-                    fileType: 'Spreadsheet (csv)',
-                    ext: 'excel_csv'
-                }, {
                     fileType: 'PDF',
                     ext: 'pdf'
                 }, {
@@ -722,16 +665,6 @@ var chartref = {};
 }());
 //begin modal events 
 (function() {
-    utils.constants = {
-        XML_OPEN_TAG: '<?xml version="1.0" encoding="UTF-8"?>\n',
-        OPEN_TAG: '<',
-        END_TAG: '>',
-        FORWARD_SLASH: '/',
-        ROW: 'row_',
-        NEW_LINE: '\n',
-        TAB: '\t'
-
-    };	
     //create utility functions
     utils.gridJson2Xml = function(obj) {
         var xml = '';
@@ -770,38 +703,54 @@ var chartref = {};
         element.click();
         document.body.removeChild(element);
     };
+    utils.validateFilename = function(filename){
+    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
+    	return regex.test(filename);
+    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
             	$filenameInput = $('#modal').find('#filename'), 
-            	$grid = $('#table').data('kendoGrid'),
                 userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
                     JSON: 'json',
                     EXCEL: 'excel',
                     XML: 'xml',
-                    PDF: 'pdf',
-                    CSV: 'csv'
+                    PDF: 'pdf'
                 };
-            switch (true) {
-                case fileType === exportType.JSON:
+                if(!utils.validateFilename(saveFileName)){
+                	saveFileName += '.' + fileType;
+                }
+             var $grid =  $("#table").data().kendoGrid;
+            switch (fileType) {
+                case  exportType.JSON:{
                     var gridJSON = $grid.dataSource.view(); //filtered datasource
                     utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
                     break;
-                case fileType === exportType.EXCEL:
+                }
+                case exportType.EXCEL:{
                     $grid.saveAsExcel();
                     break;
-                case fileType === exportType.XML:
-                    var gridJSON = $grid.dataSource.view(), //filtered datasource
+                }
+                case exportType.XML:{
+                    var gridJSON = $grid.dataSource.view(); //filtered datasource
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
                     break;
-                case fileType === exportType.PDF:
-                    $grid.saveAsPDF();
-                    break;
-                default:
+                }
+                case exportType.PDF:{
+                	//topkek
+                    $("#table").css({'position':'static','margin-top':'1000px'});
+                    $grid.saveAsPDF().done(function(){
+                   		 $("#table").css({'position':'absolute','margin-top':'0px'});
+                    	
+                    });
+                    break;}
+                default:{
                     console.log('no type found. . .');
+                    break;
+                }
             };
         },
         cancelExport: function() {
