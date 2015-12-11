@@ -247,6 +247,7 @@ var chartref = {};
 		dsRegistry.push(pieChartDatasource);
 		
 		$("#wellsOilPieChart").kendoChart({
+			theme: THEME,
 			title : {
 				text : "Oil Wells per Rate Class"
 			},
@@ -262,6 +263,7 @@ var chartref = {};
 		});	
 		
 		$("#wellsGasPieChart").kendoChart({
+			theme: THEME,
 			title : {
 				text : "Gas Wells per Rate Class"
 			},
@@ -276,6 +278,39 @@ var chartref = {};
 			}
 			
 		});	
+		
+		$("#daysOnOilPieChart").kendoChart({
+			theme: THEME,
+			title : {
+				text : "Oil Days On per Rate Class"
+			},
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartWellsDatasource,
+			series: [{data:oilDaysOnSeries}],
+			tooltip: {
+				visible: true
+			}
+			
+		});	
+		
+		$("#daysOnGasPieChart").kendoChart({
+			theme: THEME,
+			title : {
+				text : "Gas Days On per Rate Class"
+			},
+			theme:"material",
+			seriesDefaults: {
+				type: "pie"
+			},
+			dataSource : pieChartWellsDatasource,
+			series: [{data:gasDaysOnSeries}],
+			tooltip: {
+				visible: true
+			}
+		});	
+		registerDataSource($("#wellsGasPieChart").data('kendoChart').dataSource);
 	}
 	
 	function initFiltering(JSONData) {
