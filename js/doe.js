@@ -34,14 +34,8 @@ var chartref = {};
 	function filterDatabase(field, event) {
 		return; // TODO: fix this
 		var values = event.sender.value(),
-<<<<<<< HEAD
 			newFilter = ds.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field });
-=======
-			newFilter = database.filter();
-			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
-			isProdYear = field === PROD_YEAR;
->>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;
 		} else {
@@ -59,7 +53,6 @@ var chartref = {};
 		initPieChart(JSONData);	
 		initTable(JSONData);
 	}
-<<<<<<< HEAD
 	
 	function initBarCharts(JSONData) {
 		$("#wellsBarChart").kendoChart({
@@ -100,8 +93,6 @@ var chartref = {};
 		registerDataSource($("#daysOnBarChart").data('kendoChart').dataSource);
 	}
 	
-=======
->>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 	function initMaps(JSONdata){
 	var wellmap = $('#wellsMap').kendoMap({
     	center: [39.5, -120],
@@ -203,19 +194,6 @@ var chartref = {};
 	
 	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
-<<<<<<< HEAD
-			schema : {
-				model : {
-					fields : {
-						prodYear : {type : 'date'},
-						state : {type : 'string'},
-						rateClass : {type : 'number'},
-						numOilWells : {type : 'number'}
-					}
-				}
-			},
-=======
->>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 			data: JSONData,
 			group:{
 				field: "rateClass",
@@ -475,28 +453,6 @@ var chartref = {};
 				filterChange: function(event) {
 					filterDatabase(this.secondFilter.filterType, event);
 				}
-<<<<<<< HEAD
-=======
-			},
-			thirdFilter: {
-				filterTypeSource: new kendo.data.DataSource({
-					data: filterTypes
-				}),
-				filterTypeSelect: function(event) {
-					var self = this,
-						dataItem = event.sender.dataItem(event.item),
-						field = dataItem.field;
-					self.thirdFilter.set('filterType', field);
-					self.thirdFilter.set('dataSource', dataSourceMap[field]);
-					self.refreshFilters();
-				},
-				filterType: null,
-				dataSource: emptyDataSource,
-				filter: null,
-				filterChange: function(event) {
-					filterDatabase(this.thirdFilter.filterType, event);
-				}
->>>>>>> 9349fba9962375a6e111d6b987a3cebb59c9049b
 			}
 		};
 		kendo.bind($('#filters'), kendo.observable(filtering));
