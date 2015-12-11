@@ -163,13 +163,19 @@ html, body {
 
 #map {
   display: block;
-  width: 100%; }
+  width: 100%; 
+  height: 600px;
+}
 
 #barChart {
-  display: none; }
+  display: none; 
+  height: 600px;
+}
 
 #pieChart {
-  display: none; }
+  display: none; 
+  height: 600px;
+}
 
 #lineChart {
   display: inline-block;
