@@ -97,6 +97,7 @@ html,body{
     width:100%;
     height:calc(100% - 3px - #{$header_height});
     margin-top:3px;
+    overflow-x:hidden;
 }
 #sidebar{
     background-color:black;
