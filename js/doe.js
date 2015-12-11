@@ -95,6 +95,10 @@ var chartref = {};
 			tooltip : {
 				visible : true,
 				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+			},
+			legend:{
+				visible:true,
+				position:'bottom'
 			}
 		});
 		$("#daysOnBarChart").kendoChart({
@@ -130,6 +134,10 @@ var chartref = {};
 			tooltip : {
 				visible : true,
 				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+			},
+			legend:{
+				visible:true,
+				position:'bottom'
 			}
 		});		
 	}
