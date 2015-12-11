@@ -125,10 +125,10 @@ var chartref = {};
 				}
 			},
 			series: [{
-				name: 'Gas Wells Days On',
+				name: 'Gas Days On',
 				field: 'gasWellsDayson' 
 			}, {
-				name: 'Oil Well Days On',
+				name: 'Oil Days On',
 				field: 'oilWellsDayson' 
 			}],
 			tooltip : {
