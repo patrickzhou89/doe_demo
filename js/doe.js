@@ -14,14 +14,26 @@ var utils = {};
 	var DOEData = null;
 	var DOEStateMap = null;
 	
-	var rateClasses = _.range(1, 23); // 1 to 23 exclusive
-	
 	var dsRegistry = DOE.dsRegistry = [];
 	
-	function filterDatabase(field, event) {
-		return; // TODO: fix this
+	var defaultFilters = {
+		logic: 'and',
+		filters: [
+			{ field: STATE, operator: alwaysTrue },
+			{ field: PROD_YEAR, operator: alwaysTrue },
+			{ field: RATE_CLASS, operator: alwaysTrue }
+		]
+	};
+	
+	function registerDataSource(ds) {
+		ds.filter(defaultFilters);
+		ds.read();
+		dsRegistry.push(ds);
+	}
+	
+	function filterDataSource(ds, field, event) {
 		var values = event.sender.value(),
-			newFilter = database.filter();
+			newFilter = ds.filter();
 			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
 			isProdYear = field === PROD_YEAR;
 		if (values.length === 0) {
@@ -41,48 +53,59 @@ var utils = {};
 				return values.indexOf(value) >= 0;
 			};			
 		}
+		ds.filter(newFilter);
+	}
+		
+	function applyFilters(field, event) {
 		_.each(dsRegistry, function(ds) {
-			ds.filter(newFilter);			
+			filterDataSource(ds, field, event);
 		});
 	}
 	
 	function initCharts(JSONData) {
-		var barChartDataSource = new kendo.data.DataSource({
-			data: JSONData,
-			group: { 
-				field: 'rateClass', 
-				aggregates: [
-					{ field: 'numGasWells', aggregate: 'sum' },
-					{ field: 'numOilWells', aggregate: 'sum' }
-				]
-			}
-		});
-		barChartDataSource.read();
-		var barChart = $("#barChart").kendoChart({
+		initBarCharts(JSONData);
+		initLineChart(JSONData);
+		initPieChart(JSONData);	
+		initTable(JSONData);
+	}
+	
+	function initBarCharts(JSONData) {
+		$("#wellsBarChart").kendoChart({
 			theme: THEME,
-			dataSource: _.map(barChartDataSource.view(), function(item) {
-				return {
-					rateClass: item.value,
-					numGasWells: item.aggregates.numGasWells.sum,
-					numOilWells: item.aggregates.numOilWells.sum
-				};
-			}),
-			seriesDefaults: { type: "column" },
+			dataSource: JSONData, 
+			seriesDefaults: { 
+				categoryField : 'rateClass',
+				aggregate : "sum",
+				type: "column" 
+			},
 			series: [{
 				name: 'Number of Gas Wells',
 				field: 'numGasWells' 
 			}, {
 				name: 'Number of Oil Wells',
 				field: 'numOilWells' 
-			}],
-			categoryAxis: {
-				field: 'rateClass'
-			}
-		});
-		initLineChart(JSONData);
-		initPieChart(JSONData);	
-		initTable(JSONData);
+			}]
+		});		
+		registerDataSource($("#wellsBarChart").data('kendoChart').dataSource);
+		$("#daysOnBarChart").kendoChart({
+			theme: THEME,
+			dataSource: JSONData,
+			seriesDefaults: { 
+				categoryField : 'rateClass',
+				aggregate : "sum",
+				type: "column" 
+			},
+			series: [{
+				name: 'Gas Wells Days On',
+				field: 'gasWellsDayson' 
+			}, {
+				name: 'Oil Well Days On',
+				field: 'oilWellsDayson' 
+			}]
+		});		
+		registerDataSource($("#daysOnBarChart").data('kendoChart').dataSource);
 	}
+	
 	function initMaps(JSONdata){
 	$('#wellsMap').kendoMap({
     	center: [39.5, -120],
@@ -180,7 +203,7 @@ var utils = {};
 			]
 		});
 		
-		
+		registerDataSource($("#table").data('kendoGrid').dataSource);
 	}
 	
 	function initLineChart(JSONData){
@@ -199,8 +222,6 @@ var utils = {};
 			group : {
 				field : "state"
 			}});
-		lineChartDatasource.read();
-		dsRegistry.push(lineChartDatasource);
 		$("#lineChart").kendoChart({
 			theme: THEME,
 			title : {
@@ -240,6 +261,7 @@ var utils = {};
 				template : "State: #= series.name #: #= value #"
 			}
 		});	
+		registerDataSource($("#lineChart").data('kendoChart').dataSource);
 	}
 	
 	
@@ -252,7 +274,6 @@ var utils = {};
 				{ field: "numGasWells", aggregate: "sum" }]
 			}
 		});
-		pieChartDatasource.read();
 		
 		var oilSeries = [],
 		gasSeries = [],
@@ -281,7 +302,7 @@ var utils = {};
 			}
 			
 		});	
-		
+		registerDataSource($("#wellsOilPieChart").data('kendoChart').dataSource);
 		$("#wellsGasPieChart").kendoChart({
 			title : {
 				text : "Gas Wells per Rate Class"
@@ -295,8 +316,8 @@ var utils = {};
 			tooltip: {
 				visible: true
 			}
-			
 		});	
+		registerDataSource($("#wellsGasPieChart").data('kendoChart').dataSource);
 	}
 	
 	function initFiltering(JSONData) {
@@ -368,7 +389,7 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.firstFilter.filterType, event);
+					applyFilters(this.firstFilter.filterType, event);
 				}
 			},
 			secondFilter: {
@@ -409,7 +430,7 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.secondFilter.filterType, event);
+					applyFilters(this.secondFilter.filterType, event);
 				}
 			},
 			thirdFilter: {
@@ -428,7 +449,7 @@ var utils = {};
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					filterDatabase(this.thirdFilter.filterType, event);
+					applyFilters(this.thirdFilter.filterType, event);
 				}
 			}
 		};
