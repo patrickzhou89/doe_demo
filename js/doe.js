@@ -64,7 +64,10 @@ var chartref = {};
 		registerDataSource(ds);
 		$("#wellsBarChart").kendoChart({
 			theme: THEME,
-			title: 'Wells per Rate Class',
+			title: {
+				text:'Wells per Rate Class',
+				font: "bold 14px  Arial,Helvetica,sans-serif"
+			},
 			dataSource: ds, 
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -103,7 +106,10 @@ var chartref = {};
 		});
 		$("#daysOnBarChart").kendoChart({
 			theme: THEME,
-			title: 'Days On per Rate Class',
+			title: {
+				text:'Days On per Rate Class',
+				font: "bold 14px  Arial,Helvetica,sans-serif"
+			},
 			dataSource: ds,
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -351,7 +357,8 @@ var chartref = {};
 		item;
 		$("#daysOnLineChart").kendoChart({
 			title : {
-				text : "Days On per Rate Class"
+				text : "Days On per Rate Class",
+				font: "bold 14px  Arial,Helvetica,sans-serif"
 			},
 			theme: THEME,
 			seriesDefaults: { 
@@ -393,7 +400,8 @@ var chartref = {};
 		
 		var wellLines = $("#wellsLineChart").kendoChart({
 			title : {
-				text : "Wells per Rate Class"
+				text : "Wells per Rate Class",
+				font: "bold 14px  Arial,Helvetica,sans-serif"
 			},
 			theme: THEME,
 			dataSource : lineChartDatasource,
@@ -466,7 +474,8 @@ var chartref = {};
 		
 		$("#wellsOilPieChart").kendoChart({
 			title : {
-				text : "Oil Wells per Rate Class"
+				text : "Oil Wells per Rate Class",
+				font: "bold 14px  Arial,Helvetica,sans-serif"
 			},
 			seriesDefaults: {
 				labels: {
@@ -490,7 +499,8 @@ var chartref = {};
 
 		$("#wellsGasPieChart").kendoChart({
 			title : {
-				text : "Gas Wells per Rate Class"
+				text : "Gas Wells per Rate Class",
+				font: "bold 14px  Arial,Helvetica,sans-serif"
 			},
 			theme:"material",
 			seriesDefaults: {
@@ -514,7 +524,8 @@ var chartref = {};
 		});	
 		$("#daysOnOilPieChart").kendoChart({
 			title : {
-				text : "Oil Days On per Rate Class"
+				text : "Oil Days On per Rate Class",
+				font: "bold 14px  Arial,Helvetica,sans-serif"
 			},
 			seriesDefaults: {
 				labels: {
@@ -538,7 +549,8 @@ var chartref = {};
 		
 		$("#daysOnGasPieChart").kendoChart({
 			title : {
-				text : "Gas Days On per Rate Class"
+				text : "Gas Days On per Rate Class",
+				font: "bold 14px  Arial,Helvetica,sans-serif"
 			},
 			theme:"material",
 			seriesDefaults: {
