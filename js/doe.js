@@ -65,14 +65,58 @@ var chartref = {};
 		initTable(JSONData);
 	}
 	function initMaps(JSONdata){
+		var numOilSum=0,numGasSum=0, numOilDaysSum=0,numGasDaysSum=0,maxOil=0,maxGas=0, maxOilDays=0, maxGasDays=0, stateList={};
+   		$.each(DOEData, function(){
+   			state=DOEStateMap[this.state];
+   			if(stateList[state]){
+   				stateList[state].numOilWellTotal+=this.numOilWells;
+   				stateList[state].numGasWellTotal+=this.numGasWells;
+   				stateList[state].numOilWellDaysOnTotal+=this.oilWellsDayson;
+   				stateList[state].numGasWellDaysOnTotal+=this.gasWellsDayson;
+   			}else{
+   				stateList[state] = {
+   					numOilWellTotal:this.numOilWells,
+   					numGasWellTotal:this.numGasWells,
+   					numOilWellDaysOnTotal:this.oilWellsDayson,
+   					numGasWellDaysOnTotal:this.gasWellsDayson
+   				}
+   			}
+   			numOilSum+=this.numOilWells;
+   			numGasSum+=this.numGasWells;
+   			numOilDaysSum+=this.oilWellsDayson;
+   			numGasDaysSum+=this.gasWellsDayson;
+   		});
+   		$.each(stateList,function(){
+   			var gasWellRatio=this.numGasWellTotal/numGasSum,
+   			    oilWellRatio=this.numOilWellTotal/numOilSum,
+   				gasWellDaysOnRatio=this.numGasWellDaysOnTotal/numGasDaysSum,
+   				oilWellDaysOnRatio=this.numOilWellDaysOnTotal/numOilDaysSum;
+   			if(gasWellRatio>maxGas){
+   				maxGas=gasWellRatio;
+   			}
+   			if(oilWellRatio>maxOil){
+   				maxOil=oilWellRatio;
+   			}
+   			if(gasWellDaysOnRatio>maxGasDays){
+   				maxGasDays=gasWellDaysOnRatio;
+   			}
+   			if(oilWellDaysOnRatio>maxOilDays){
+   				maxOilDays=oilWellDaysOnRatio;
+   			}
+   			this['gasRatio']=gasWellRatio;
+   			this['oilRatio']=oilWellRatio;
+   			this['gasDaysOnRatio']=gasWellDaysOnRatio;
+   			this['oilDaysOnRatio']=oilWellDaysOnRatio;
+   		})
 	var wellmap = $('#wellsMap').kendoMap({
-    	center: [39.5, -120],
+    	center: [38.5, -90],
         zoom: 4,
         controls:{
           	attribution: false,
            	navigator: false,
            	zoom: false
         },
+        pannable:false,
         zoomable: false,
         layers: [{
             type: "shape",
@@ -84,40 +128,54 @@ var chartref = {};
            	},
             style: {
                 fill: {
-                    opacity: 0.7,
-                    color: 'blue'
+                    opacity: 0,
+                    color: '#3E2723'
                 }
             }
         }],
         shapeCreated: function(e){
           	var shape = e.shape,
-           		createdState = shape.dataItem.properties.name,
-           		filteredData = DOEData,
-           		oilSumTotal = 0,
-           		gasSumTotal = 0,
-           		stateGasTotal = 0,
-           		stateOilTotal = 0;
-           		stateData = $.map(filteredData, function(n, i){
-           			oilSumTotal += n.numOilWells;
-           			gasSumTotal += n.numGasWells;
-           			if(DOEStateMap[n.state] === createdState){
-           				stateOilTotal += n.numOilWells;
-           				stateGasTotal += n.numGasWells;             				
-           				return n;
-           			}
-           		});
-            		// console.log('stateOilTotal:', stateOilTotal);
-            		// console.log('stateGasTotal:', stateGasTotal);
-            		// console.log('oilSumTotal:', oilSumTotal);
-            		// console.log('gasSumTotal:', gasSumTotal); 
-            		// console.log('% gas usage by state ' + createdState +':', (stateGasTotal / gasSumTotal) * 100);
-            		// console.log('% oil usage by state ' + createdState +':', (stateOilTotal / oilSumTotal) * 100);     		
-            		// console.log('shape:', shape);
-       		shape.options.fill.opacity = (stateOilTotal / oilSumTotal) * 100;
-            }
-         }).data('kendoMap');		
+       		createdState = shape.dataItem.properties.name;
+       		if(stateList[createdState]){
+       			shape.options.fill.opacity = stateList[createdState].oilRatio / maxOil;
+       		}
+        }
+    }).data('kendoMap');
 
-		wellmap.resize();
+	wellmap.resize();
+	var dayson = $('#daysOnMap').kendoMap({
+    	center: [38.5, -90],
+        zoom: 4,
+        controls:{
+          	attribution: false,
+           	navigator: false,
+           	zoom: false
+        },
+        pannable:true,
+        zoomable: false,
+        layers: [{
+            type: "shape",
+              	dataSource: {
+           	    type: "geojson",
+               	transport: {
+                	read: "data/us.geo.json"
+               	}
+           	},
+            style: {
+                fill: {
+                    opacity: 0,
+                    color: '#3E2723'
+                }
+            }
+        }],
+        shapeCreated: function(e){
+          	var shape = e.shape,
+       		createdState = shape.dataItem.properties.name;
+       		if(stateList[createdState]){
+       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / maxOilDays;
+       		}
+     }}).data('kendoMap');	
+	dayson.resize();
 	}
 	
 	function initTable(JSONData){
@@ -165,42 +223,37 @@ var chartref = {};
 	
 	function initLineChart(JSONData){
 		var lineChartDatasource = new kendo.data.DataSource({
+			schema : {
+				model : {
+					fields : {
+						prodYear : {type : 'date'},
+						state : {type : 'string'},
+						rateClass : {type : 'number'},
+						numOilWells : {type : 'number'}	
+					}
+				}
+			},
 			data: JSONData,
-			group:{
-				field: "rateClass",
-				aggregates: [{ field: "numOilWells", aggregate: "sum" },
-				{field: "numGasWells", aggregate: "sum" },
-				{ field: "oilWellsDayson", aggregate: "sum" },
-				{ field: "gasWellsDayson", aggregate: "sum" }]
+			group : {
+				field : "state"
 			}});
 		lineChartDatasource.read();
-		
-		var oilWellSeries = [],
-		gasWellSeries = [],
-		gasDaysOnSeries = [],
-		oilDaysOnSeries = [],
-		categories = [],
-		items = lineChartDatasource.view(),
-		length = items.length,
-		item;
-		//create the chart series  
-		for (var i = 0; i < length; i++) {
-			item = items[i];
-			categories.push(items[i].value);
-			oilWellSeries.push({type : "line",name: "Oil Wells", category: item.value, value: item.aggregates.numOilWells.sum});
-			gasWellSeries.push({type : "line",name: "Gas Wells", category: item.value, value: item.aggregates.numGasWells.sum});
-			gasDaysOnSeries.push({type : "line",name: "Gas Days On", category: item.value, value: item.aggregates.oilWellsDayson.sum});
-			oilDaysOnSeries.push({type : "line",name: "Oil Days On", category: item.value, value: item.aggregates.gasWellsDayson.sum});
-		}
-		
 		dsRegistry.push(lineChartDatasource);
-		$("#daysOnLineChart").kendoChart({
+		$("#lineChart").kendoChart({
 			title : {
-				text : "Days On per Rate Class"
+				text : "Wells Per State"
 			},
 			theme:"material",
 			dataSource : lineChartDatasource,
-			series : [gasDaysOnSeries, oilDaysOnSeries ],
+			series : [ {
+				type : "line",
+				field : "numOilWells",
+				categoryField : 'prodYear',
+				name : "#= group.value #",
+				aggregate : "sum",
+				padding : 10, 
+				colorField: 'color'
+			} ],
 			legend : {
 				position : "bottom",
 				visible : true
@@ -210,37 +263,20 @@ var chartref = {};
 					format : "{0}"
 				}
 			},
-			categoryAxis: {
-				categories:categories
+			categoryAxis : {
+				field : "prodYear",
+				baseUnit : "fit",
+				type : 'date',
+				labels : {
+					format : "yyyy",
+					rotation : 315
+				}
 			},
 			tooltip : {
-				visible : true
+				visible : true,
+				template : "State: #= series.name #: #= value #"
 			}
 		});	
-		
-		$("#wellsLineChart").kendoChart({
-			title : {
-				text : "Wells per Rate Class"
-			},
-			theme:"material",
-			dataSource : lineChartDatasource,
-			series : [oilWellSeries, gasWellSeries ],
-			legend : {
-				position : "bottom",
-				visible : true
-			},
-			valueAxis : {
-				labels : {
-					format : "{0}"
-				}
-			},
-			categoryAxis: {
-				categories:categories
-			},
-			tooltip : {
-				visible : true
-			}
-		});
 	}
 	
 	
@@ -269,7 +305,6 @@ var chartref = {};
 		dsRegistry.push(pieChartDatasource);
 		
 		$("#wellsOilPieChart").kendoChart({
-			theme: THEME,
 			title : {
 				text : "Oil Wells per Rate Class"
 			},
@@ -285,7 +320,6 @@ var chartref = {};
 		});	
 		
 		$("#wellsGasPieChart").kendoChart({
-			theme: THEME,
 			title : {
 				text : "Gas Wells per Rate Class"
 			},
@@ -300,39 +334,6 @@ var chartref = {};
 			}
 			
 		});	
-		
-		$("#daysOnOilPieChart").kendoChart({
-			theme: THEME,
-			title : {
-				text : "Oil Days On per Rate Class"
-			},
-			seriesDefaults: {
-				type: "pie"
-			},
-			dataSource : pieChartWellsDatasource,
-			series: [{data:oilDaysOnSeries}],
-			tooltip: {
-				visible: true
-			}
-			
-		});	
-		
-		$("#daysOnGasPieChart").kendoChart({
-			theme: THEME,
-			title : {
-				text : "Gas Days On per Rate Class"
-			},
-			theme:"material",
-			seriesDefaults: {
-				type: "pie"
-			},
-			dataSource : pieChartWellsDatasource,
-			series: [{data:gasDaysOnSeries}],
-			tooltip: {
-				visible: true
-			}
-		});	
-		registerDataSource($("#wellsGasPieChart").data('kendoChart').dataSource);
 	}
 	
 	function initFiltering(JSONData) {
@@ -639,7 +640,6 @@ var chartref = {};
                     PDF: 'pdf',
                     CSV: 'csv'
                 };
-                console.log(utils.validateFilename(saveFileName));
                 if(!utils.validateFilename(saveFileName)){
                 	saveFileName += '.' + fileType;
                 }

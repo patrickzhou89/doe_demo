@@ -164,6 +164,8 @@ html, body {
 #map {
   display: block;
   width: 100%; }
+  #map > div {
+    height: 400px; }
 
 #barChart {
   display: none; }
@@ -186,9 +188,6 @@ html, body {
 .modal-row input {
   padding: 5px;
   width: 388px; }
-
-#wellsMap {
-  height: 600px; }
 
 #modal-actions {
   text-align: right;
