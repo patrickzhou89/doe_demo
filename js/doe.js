@@ -60,14 +60,21 @@ var chartref = {};
 	}
 	
 	function initBarCharts(JSONData) {
+		var ds = new kendo.data.DataSource({ data: JSONData });
+		registerDataSource(ds);
 		$("#wellsBarChart").kendoChart({
 			theme: THEME,
 			title: 'Number of Wells',
-			dataSource: JSONData, 
+			dataSource: ds, 
 			seriesDefaults: { 
 				categoryField : 'rateClass',
 				aggregate : "sum",
 				type: "column" 
+			},
+			categoryAxis: {
+				labels: {
+					rotation: -45
+				}								
 			},
 			series: [{
 				name: 'Number of Gas Wells',
@@ -77,15 +84,19 @@ var chartref = {};
 				field: 'numOilWells' 
 			}]
 		});
-		registerDataSource($("#wellsBarChart").data('kendoChart').dataSource);
 		$("#daysOnBarChart").kendoChart({
 			theme: THEME,
 			title: 'Well Days On',
-			dataSource: JSONData,
+			dataSource: ds,
 			seriesDefaults: { 
 				categoryField : 'rateClass',
 				aggregate : "sum",
 				type: "column" 
+			},
+			categoryAxis: {
+				labels: {
+					rotation: -45
+				}								
 			},
 			series: [{
 				name: 'Gas Wells Days On',
@@ -95,7 +106,6 @@ var chartref = {};
 				field: 'oilWellsDayson' 
 			}]
 		});		
-		registerDataSource($("#daysOnBarChart").data('kendoChart').dataSource);
 	}
 	
 	function initMaps(JSONdata){
