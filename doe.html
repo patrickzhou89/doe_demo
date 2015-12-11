@@ -58,7 +58,30 @@
 			<div id="table"></div>
 		</div>
 		<div id='filter-bar'>
-			<div id="filters">
+			<form id="filters">
+				<table class="filter-section">
+					<tr>
+						<td style="text-align: right; padding-right: 5px;"><label for="displaySeriesBoth">Both Gas &amp; Oil:</label></td>
+						<td>
+							<input type="radio" name="displaySeries" id="displaySeriesBoth" 
+								 value="both" checked data-bind="events: { change: displaySeriesChecked }">
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align: right; padding-right: 5px;"><label for="displaySeriesGas">Gas Only:</label></td>
+						<td>
+							<input type="radio" name="displaySeries" id="displaySeriesGas" 
+								value="gas" data-bind="events: { change: displaySeriesChecked }">
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align: right; padding-right: 5px;"><label for="displaySeriesOil">Oil Only:</label></td>
+						<td>
+							<input type="radio" name="displaySeries" id="displaySeriesOil" 
+								value="oil" data-bind="events: { change: displaySeriesChecked }">
+						</td>
+					</tr>
+				</table>
 				<div id="first-filter" class="filter-section">
 					<input id="first-filter-type" data-role="dropdownlist"
 						data-value-primitive="true"
@@ -81,7 +104,7 @@
 						data-bind="value: secondFilter.filter, source: secondFilter.dataSource, events: { change: secondFilter.filterChange }">
 					</div>
 				</div>
-			</div>
+			</form>
 		</div>
 	</div>
 	<div id="modal">

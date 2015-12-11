@@ -378,27 +378,68 @@ var chartref = {};
 		});	
 	}
 	
+	
 	function initFiltering(JSONData) {
+		function retrieveData(key) {
+			return _.chain(JSONData).pluck(key).uniq().value();
+		}
+		
 		var stateDataSource = new kendo.data.DataSource({
-			data: _.chain(JSONData).pluck(STATE).uniq().value()
+			data: retrieveData(STATE)
 		});
+		stateDataSource.read();
 		var yearDataSource = new kendo.data.DataSource({
-			data: _.chain(JSONData).pluck(PROD_YEAR).uniq().value()
+			data: retrieveData(PROD_YEAR)
 		});
-		var rateClassDataSource = new kendo.data.DataSource({
-			data: _.range(1, 27)
-		});
+		yearDataSource.read();
 		var emptyDataSource = new kendo.data.DataSource({ data: [] });
 		var dataSourceMap = {};
 		dataSourceMap[STATE] = stateDataSource;
 		dataSourceMap[PROD_YEAR] = yearDataSource;
-		dataSourceMap[RATE_CLASS] = rateClassDataSource;
 		var filterTypes = [
 			{ field: STATE, display: 'States' }, 
 			{ field: PROD_YEAR, display: 'Years' }
 		];
 		var $secondFilter = $('#second-filter');
 		var filtering = {
+			displaySeriesChecked: function(event) {
+				var $target = $(event.target),
+					daysOnLineChartSeries = $("#daysOnLineChart").getKendoChart().options.series,
+					wellsLineChartSeries = $("#wellsLineChart").getKendoChart().options.series,
+					wellsBarChartSeries = $("#wellsBarChart").getKendoChart().options.series,
+					daysOnBarChartSeries = $("#daysOnBarChart").getKendoChart().options.series,
+					showOil, showGas;
+				if ($target.is("#displaySeriesBoth")) {
+					showOil = showGas = true;
+					$('#daysOnGasPieChart, #daysOnOilPieChart, #wellsGasPieChart, #wellsOilPieChart').show();
+				} else if ($target.is("#displaySeriesGas")) {
+					showOil = false;
+					showGas = true;
+					$('#daysOnGasPieChart').show();
+					$('#daysOnOilPieChart').hide();
+					$('#wellsGasPieChart').show();
+					$('#wellsOilPieChart').hide();
+				} else if ($target.is("#displaySeriesOil")) {
+					showOil = true;
+					showGas = false;
+					$('#daysOnGasPieChart').hide();
+					$('#daysOnOilPieChart').show();
+					$('#wellsGasPieChart').hide();
+					$('#wellsOilPieChart').show();
+				}
+				daysOnLineChartSeries[0].visible = showGas;
+				daysOnLineChartSeries[1].visible = showOil;
+				wellsLineChartSeries[0].visible = showGas;
+				wellsLineChartSeries[1].visible = showOil;
+				wellsBarChartSeries[0].visible = showGas;
+				wellsBarChartSeries[1].visible = showOil;
+				daysOnBarChartSeries[0].visible = showGas;
+				daysOnBarChartSeries[1].visible = showOil;
+				$("#daysOnLineChart").getKendoChart().redraw();
+				$("#wellsLineChart").getKendoChart().redraw();
+				$("#wellsBarChart").getKendoChart().redraw();
+				$("#daysOnBarChart").getKendoChart().redraw();
+			},
 			refreshFilters: function() {
 				$('#first-filter-select').data('kendoMultiSelect').refresh();
 				$('#second-filter-select').data('kendoMultiSelect').refresh();
@@ -435,13 +476,25 @@ var chartref = {};
 							}
 						});
  					}
+					self.filterDependentMultiselect();
 					self.refreshFilters();
 				},
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					applyFilters(this.firstFilter.filterType, event);
+					var self = this;
+					applyFilters(self.firstFilter.filterType, event);
+					self.filterDependentMultiselect();
 				}
+			},
+			filterDependentMultiselect: function() {
+				var self = this;
+				if (!self.firstFilter.filter || !self.secondFilter.filterType) return;
+				self.secondFilter.dataSource.data(_.chain(JSONData)
+					.filter(function(item) {
+						var matches = self.firstFilter.filter.indexOf(item[self.firstFilter.filterType]) >= 0;
+						return matches ? !!(item.numGasWells || item.numOilWells || item.oilWellsDayson || item.gasWellsDayson) : false;
+					}).pluck(self.secondFilter.filterType).uniq().value());
 			},
 			secondFilter: {
 				filterTypeSource: new kendo.data.DataSource({
@@ -458,13 +511,16 @@ var chartref = {};
 						self.secondFilter.set('filterType', field);
 						self.secondFilter.set('dataSource', dataSourceMap[field]);
  					}
+					self.filterDependentMultiselect();
 					self.refreshFilters();
 				},
 				filterType: null,
 				dataSource: emptyDataSource,
 				filter: null,
 				filterChange: function(event) {
-					applyFilters(this.secondFilter.filterType, event);
+					var self = this;
+					applyFilters(self.secondFilter.filterType, event);
+					self.filterDependentMultiselect();
 				}
 			}
 		};
