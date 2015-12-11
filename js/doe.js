@@ -34,22 +34,11 @@ var utils = {};
 	function filterDataSource(ds, field, event) {
 		var values = event.sender.value(),
 			newFilter = ds.filter();
-			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
-			isProdYear = field === PROD_YEAR;
+			filter = _.find(newFilter.filters, function(item) { return item.field === field });
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;
 		} else {
-			if (isProdYear) {
-				values = _.map(values, function(year) { return new Date('01/01/' + year).getTime(); });
-			}
 			filter.operator = function(value) {
-				if (isProdYear) {
-					if (value instanceof Date) {
-						value = value.getTime();
-					} else {
-						value = new Date(value).getTime();
-					}
-				}
 				return values.indexOf(value) >= 0;
 			};			
 		}
@@ -72,6 +61,7 @@ var utils = {};
 	function initBarCharts(JSONData) {
 		$("#wellsBarChart").kendoChart({
 			theme: THEME,
+			title: 'Number of Wells',
 			dataSource: JSONData, 
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -89,6 +79,7 @@ var utils = {};
 		registerDataSource($("#wellsBarChart").data('kendoChart').dataSource);
 		$("#daysOnBarChart").kendoChart({
 			theme: THEME,
+			title: 'Well Days On',
 			dataSource: JSONData,
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -214,7 +205,7 @@ var utils = {};
 						prodYear : {type : 'date'},
 						state : {type : 'string'},
 						rateClass : {type : 'number'},
-						numOilWells : {type : 'number'}	
+						numOilWells : {type : 'number'}
 					}
 				}
 			},
@@ -366,8 +357,7 @@ var utils = {};
 			data: _.chain(JSONData).pluck(STATE).uniq().value()
 		});
 		var yearDataSource = new kendo.data.DataSource({
-			data: _.chain(JSONData).pluck(PROD_YEAR).uniq()
-				.map(function(item) { return item.substring(6); }).value()
+			data: _.chain(JSONData).pluck(PROD_YEAR).uniq().value()
 		});
 		var rateClassDataSource = new kendo.data.DataSource({
 			data: _.range(1, 27)
@@ -382,12 +372,11 @@ var utils = {};
 			{ field: PROD_YEAR, display: 'Years' }, 
 			{ field: RATE_CLASS, display: 'Rate Classes' }
 		];
-		var $secondFilter = $('#second-filter'), $thirdFilter = $('#third-filter');
+		var $secondFilter = $('#second-filter');
 		var filtering = {
 			refreshFilters: function() {
 				$('#first-filter-select').data('kendoMultiSelect').refresh();
 				$('#second-filter-select').data('kendoMultiSelect').refresh();
-				$('#third-filter-select').data('kendoMultiSelect').refresh();
 			},
 			firstFilter: {
 				filterType: null,
@@ -421,10 +410,6 @@ var utils = {};
 							}
 						});
  					}
-					if (!$thirdFilter.is(':hidden')) {
-						kendo.fx($thirdFilter).expand('vertical').reverse();
-					}
-					self.thirdFilter.set('dataSource', emptyDataSource);
 					self.refreshFilters();
 				},
 				dataSource: emptyDataSource,
@@ -444,27 +429,10 @@ var utils = {};
 					if (!field) {
 						self.secondFilter.set('filterType', null);
 						self.secondFilter.set('dataSource', emptyDataSource);
-						if (!$thirdFilter.is(':hidden')) {
-							kendo.fx($thirdFilter).expand('vertical').reverse();							
-						}
 					} else {
 						self.secondFilter.set('filterType', field);
 						self.secondFilter.set('dataSource', dataSourceMap[field]);
-						if ($thirdFilter.is(':hidden')) {
-							kendo.fx($thirdFilter).expand('vertical').play();							
-						}
-						self.thirdFilter.filterTypeSource.filter({
-							field: 'field', 
-							operator: function(field) {
-								var firstFilterType = 
-									$('#first-filter-type').data('kendoDropDownList').value();
-								var secondFilterType = 
-									$('#second-filter-type').data('kendoDropDownList').value();
-								return !(firstFilterType === field || secondFilterType === field);
-							}
-						});
  					}
-					self.thirdFilter.set('dataSource', emptyDataSource);
 					self.refreshFilters();
 				},
 				filterType: null,
@@ -473,30 +441,10 @@ var utils = {};
 				filterChange: function(event) {
 					applyFilters(this.secondFilter.filterType, event);
 				}
-			},
-			thirdFilter: {
-				filterTypeSource: new kendo.data.DataSource({
-					data: filterTypes
-				}),
-				filterTypeSelect: function(event) {
-					var self = this,
-						dataItem = event.sender.dataItem(event.item),
-						field = dataItem.field;
-					self.thirdFilter.set('filterType', field);
-					self.thirdFilter.set('dataSource', dataSourceMap[field]);
-					self.refreshFilters();
-				},
-				filterType: null,
-				dataSource: emptyDataSource,
-				filter: null,
-				filterChange: function(event) {
-					applyFilters(this.thirdFilter.filterType, event);
-				}
 			}
 		};
 		kendo.bind($('#filters'), kendo.observable(filtering));
 		$('#second-filter').hide();
-		$('#third-filter').hide();
 	}
 	
 	function init() {
