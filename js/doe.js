@@ -3,52 +3,68 @@ var utils = {};
 var chartref = {};
 (function() {
 	
-	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass';
+	var THEME = 'material';
+	
+	var STATE = 'state', PROD_YEAR = 'prodYear', RATE_CLASS = 'rateClass',
+		GAS_WELLS_DAYS_ON = 'gasWellsDayson', NUM_GAS_WELLS = 'numGasWells',
+		OIL_WELLS_DAYS_ON = 'oilWellsDayson', NUM_OIL_WELLS = 'numOilWells',
+		GAS = 'gas', OIL = 'oil';
 	
 	var alwaysTrue = _.constant(true);
 	
 	var DOEData = null;
 	var DOEStateMap = null;
 	
-	/*
-	var database = DOE.database = new kendo.data.DataSource({
-		transport: {
-			read: 'data/states.json'
-		},
-		//schema: { model: DataModel },
-		filter: {
-			logic: 'and',
-			filters: [
-				{ field: STATE, operator: alwaysTrue },
-				{ field: PROD_YEAR, operator: alwaysTrue },
-				{ field: RATE_CLASS, operator: alwaysTrue }
-			]
-		}
-	});
-	
-	var databaseReadPromise = database.read();
-	*/
-	
 	var dsRegistry = DOE.dsRegistry = [];
 	
-	function filterDatabase(field, event) {
-		return; // TODO: fix this
+	var defaultFilters = {
+		logic: 'and',
+		filters: [
+			{ field: STATE, operator: alwaysTrue },
+			{ field: PROD_YEAR, operator: alwaysTrue },
+			{ field: RATE_CLASS, operator: alwaysTrue }
+		]
+	};
+	
+	function registerDataSource(ds) {
+		ds.filter(defaultFilters);
+		ds.read();
+		dsRegistry.push(ds);
+	}
+	
+	function filterDataSource(ds, field, event) {
 		var values = event.sender.value(),
 			newFilter = ds.filter();
-			filter = _.find(newFilter.filters, function(item) { return item.field === field });
+			filter = _.find(newFilter.filters, function(item) { return item.field === field }),
+			isProdYear = field === PROD_YEAR;
 		if (values.length === 0) {
 			filter.operator = alwaysTrue;
 		} else {
+			if (isProdYear) {
+				values = _.map(values, function(year) { return new Date('01/01/' + year).getTime(); });
+			}
 			filter.operator = function(value) {
+				if (isProdYear) {
+					if (value instanceof Date) {
+						value = value.getTime();
+					} else {
+						value = new Date(value).getTime();
+					}
+				}
 				return values.indexOf(value) >= 0;
 			};			
 		}
+		ds.filter(newFilter);
+	}
+		
+	function applyFilters(field, event) {
 		_.each(dsRegistry, function(ds) {
-			ds.filter(newFilter);			
+			filterDataSource(ds, field, event);
 		});
 	}
 	
 	function initCharts(JSONData) {
+		initBarCharts(JSONData);
 		initLineChart(JSONData);
 		initPieChart(JSONData);	
 		initTable(JSONData);
