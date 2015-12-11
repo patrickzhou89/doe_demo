@@ -16,7 +16,7 @@ var chartref = {};
 	var DOEStateMap = null;
 	
 	var dsRegistry = DOE.dsRegistry = [];
-	
+	var $grid;
 	var defaultFilters = {
 		logic: 'and',
 		filters: [
@@ -64,7 +64,7 @@ var chartref = {};
 		registerDataSource(ds);
 		$("#wellsBarChart").kendoChart({
 			theme: THEME,
-			title: 'Number of Wells',
+			title: 'Wells per Rate Class',
 			dataSource: ds, 
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -76,17 +76,34 @@ var chartref = {};
 					rotation: -45
 				}								
 			},
+			valueAxis : {
+				labels : {
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+					}
+				}
+			},
 			series: [{
 				name: 'Number of Gas Wells',
 				field: 'numGasWells' 
 			}, {
 				name: 'Number of Oil Wells',
 				field: 'numOilWells' 
-			}]
+			}],
+			tooltip : {
+				visible : true,
+				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+			},
+			legend:{
+				visible:true,
+				position:'bottom'
+			}
 		});
 		$("#daysOnBarChart").kendoChart({
 			theme: THEME,
-			title: 'Well Days On',
+			title: 'Days On per Rate Class',
 			dataSource: ds,
 			seriesDefaults: { 
 				categoryField : 'rateClass',
@@ -98,25 +115,102 @@ var chartref = {};
 					rotation: -45
 				}								
 			},
+			valueAxis : {
+				labels : {
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+					}
+				}
+			},
 			series: [{
 				name: 'Gas Wells Days On',
 				field: 'gasWellsDayson' 
 			}, {
 				name: 'Oil Well Days On',
 				field: 'oilWellsDayson' 
-			}]
+			}],
+			tooltip : {
+				visible : true,
+				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
+			},
+			legend:{
+				visible:true,
+				position:'bottom'
+			}
 		});		
 	}
-	
+	function retreiveFormattedStateData(JSONData){
+		var numOilSum=0,numGasSum=0, numOilDaysSum=0,numGasDaysSum=0,maxOil=0,maxGas=0, maxOilDays=0, maxGasDays=0, stateList={};
+   		$.each(JSONData, function(){
+   			state=DOEStateMap[this.state];
+   			if(stateList[state]){
+   				stateList[state].numOilWellTotal+=this.numOilWells;
+   				stateList[state].numGasWellTotal+=this.numGasWells;
+   				stateList[state].numOilWellDaysOnTotal+=this.oilWellsDayson;
+   				stateList[state].numGasWellDaysOnTotal+=this.gasWellsDayson;
+   			}else{
+   				stateList[state] = {
+   					numOilWellTotal:this.numOilWells,
+   					numGasWellTotal:this.numGasWells,
+   					numOilWellDaysOnTotal:this.oilWellsDayson,
+   					numGasWellDaysOnTotal:this.gasWellsDayson
+   				}
+   			}
+   			numOilSum+=this.numOilWells;
+   			numGasSum+=this.numGasWells;
+   			numOilDaysSum+=this.oilWellsDayson;
+   			numGasDaysSum+=this.gasWellsDayson;
+   		});
+   		$.each(stateList,function(){
+   			var gasWellRatio=this.numGasWellTotal/numGasSum,
+   			    oilWellRatio=this.numOilWellTotal/numOilSum,
+   				gasWellDaysOnRatio=this.numGasWellDaysOnTotal/numGasDaysSum,
+   				oilWellDaysOnRatio=this.numOilWellDaysOnTotal/numOilDaysSum;
+   			if(gasWellRatio>maxGas){
+   				maxGas=gasWellRatio;
+   			}
+   			if(oilWellRatio>maxOil){
+   				maxOil=oilWellRatio;
+   			}
+   			if(gasWellDaysOnRatio>maxGasDays){
+   				maxGasDays=gasWellDaysOnRatio;
+   			}
+   			if(oilWellDaysOnRatio>maxOilDays){
+   				maxOilDays=oilWellDaysOnRatio;
+   			}
+   			this['gasRatio']=gasWellRatio;
+   			this['oilRatio']=oilWellRatio;
+   			this['gasDaysOnRatio']=gasWellDaysOnRatio;
+   			this['oilDaysOnRatio']=oilWellDaysOnRatio;
+   			this['maxOil']=maxOil;
+   			this['maxOilDays']=maxOilDays;
+   		});
+   		return stateList;
+	}
 	function initMaps(JSONdata){
+		var ds = new kendo.data.DataSource({
+			data: JSONdata,
+			change: function(e){
+				var $dayson = $('#daysOnMap').data('kendoMap'),
+					$wellsMap = $('#wellsMap').data('kendoMap');
+				if($dayson && $dayson){
+					$dayson.setOptions({});
+					$wellsMap.setOptions({});
+				}
+			}
+		});
+		registerDataSource(ds);		
 	var wellmap = $('#wellsMap').kendoMap({
-    	center: [39.5, -120],
+    	center: [38.5, -90],
         zoom: 4,
         controls:{
           	attribution: false,
            	navigator: false,
            	zoom: false
         },
+        pannable:false,
         zoomable: false,
         layers: [{
             type: "shape",
@@ -128,40 +222,73 @@ var chartref = {};
            	},
             style: {
                 fill: {
-                    opacity: 0.7,
-                    color: 'blue'
+                    opacity: 0,
+                    color: '#FF9800'
                 }
             }
         }],
         shapeCreated: function(e){
           	var shape = e.shape,
-           		createdState = shape.dataItem.properties.name,
-           		filteredData = DOEData,
-           		oilSumTotal = 0,
-           		gasSumTotal = 0,
-           		stateGasTotal = 0,
-           		stateOilTotal = 0;
-           		stateData = $.map(filteredData, function(n, i){
-           			oilSumTotal += n.numOilWells;
-           			gasSumTotal += n.numGasWells;
-           			if(DOEStateMap[n.state] === createdState){
-           				stateOilTotal += n.numOilWells;
-           				stateGasTotal += n.numGasWells;             				
-           				return n;
-           			}
-           		});
-            		// console.log('stateOilTotal:', stateOilTotal);
-            		// console.log('stateGasTotal:', stateGasTotal);
-            		// console.log('oilSumTotal:', oilSumTotal);
-            		// console.log('gasSumTotal:', gasSumTotal); 
-            		// console.log('% gas usage by state ' + createdState +':', (stateGasTotal / gasSumTotal) * 100);
-            		// console.log('% oil usage by state ' + createdState +':', (stateOilTotal / oilSumTotal) * 100);     		
-            		// console.log('shape:', shape);
-       		shape.options.fill.opacity = (stateOilTotal / oilSumTotal) * 100;
-            }
-         }).data('kendoMap');		
+       		createdState = shape.dataItem.properties.name;
+       		var stateList = retreiveFormattedStateData(ds.view());
+       		if(stateList[createdState]){
+       			shape.options.fill.opacity = stateList[createdState].oilRatio / stateList[createdState].maxOil;
+       		}
+        }
+    }).data('kendoMap');
 
-		wellmap.resize();
+	wellmap.resize();
+	var dayson = $('#daysOnMap').kendoMap({
+    	center: [38.5, -90],
+        zoom: 4,
+        controls:{
+          	attribution: false,
+           	navigator: false,
+           	zoom: false
+        },
+        pannable:true,
+        zoomable: false,
+        layers: [{
+            type: "shape",
+              	dataSource: {
+           	    type: "geojson",
+               	transport: {
+                	read: "data/us.geo.json"
+               	}
+           	},
+            style: {
+                fill: {
+                    opacity: 0,
+                    color: '#FF9800'
+                }
+            }
+        }],
+        shapeCreated: function(e){
+          	var shape = e.shape,
+       		createdState = shape.dataItem.properties.name,
+       		stateList = retreiveFormattedStateData(ds.view());
+       		if(stateList[createdState]){
+       			shape.options.fill.opacity = stateList[createdState].oilDaysOnRatio / stateList[createdState].maxOilDays;
+       		}
+     }}).data('kendoMap');	
+	dayson.resize();
+	}
+
+	function toggleMaps(){
+		var wellMap = $('#wellsMap').data('kendoMap'),
+		dayson = $('#daysOnMap').data('kendoMap'),
+		wellLayer = wellMap.layers,
+		daysonLayer = dayson.layers; 
+
+		wellLayer[0].options.style.fill.color = 'blue';
+		daysonLayer[0].options.style.fill.color = 'green';
+
+		wellMap.setOptions({
+			layers: wellLayer
+		});
+		daysonLayer.setOptions({
+			layers: daysonLayer
+		});		
 	}
 	
 	function initTable(JSONData){
@@ -234,10 +361,10 @@ var chartref = {};
 			},
 			dataSource : lineChartDatasource,
 			series: [{
-				name: 'Gas Wells Days On',
+				name: 'Gas',
 				field: 'gasWellsDayson' 
 			}, {
-				name: 'Oil Well Days On',
+				name: 'Oil',
 				field: 'oilWellsDayson' 
 			}],
 			legend : {
@@ -246,15 +373,25 @@ var chartref = {};
 			},
 			valueAxis : {
 				labels : {
-					format : "{0}"
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+			}
 				}
 			},
+			categoryAxis: {
+				labels: {
+					rotation: -45
+				}								
+			},
 			tooltip : {
+				template: "#: series.name#<br/> Days On:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
 				visible : true
 			}
 		});	
 		
-		$("#wellsLineChart").kendoChart({
+		var wellLines = $("#wellsLineChart").kendoChart({
 			title : {
 				text : "Wells per Rate Class"
 			},
@@ -278,13 +415,24 @@ var chartref = {};
 			}],
 			valueAxis : {
 				labels : {
-					format : "{0}"
+					format: "n0",
+					rotation : 315,
+					padding:{
+						top: 30
+					}
 				}
 			},
+			categoryAxis: {
+				labels: {
+					rotation: -45
+				}								
+			},
 			tooltip : {
-				visible : true
+				visible : true,
+				template: "#: series.name#<br/> Wells:#=kendo.toString(value, 'n0')#<br/> Rate Class:#: category#",
 			}
-		});
+		});	
+		wellLines.resize();
 	}
 	
 	
@@ -321,14 +469,23 @@ var chartref = {};
 				text : "Oil Wells per Rate Class"
 			},
 			seriesDefaults: {
+				labels: {
+			template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:oilSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Wells: #=kendo.toString(value, 'n0')#",
+				color: 'white'
+			},
+			legend:{
+				visible:false
 			}
-			
 		});	
 
 		$("#wellsGasPieChart").kendoChart({
@@ -337,29 +494,46 @@ var chartref = {};
 			},
 			theme:"material",
 			seriesDefaults: {
+				labels: {
+			template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:gasSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Wells: #=kendo.toString(value, 'n0')#",
+				color: 'white'
+			},
+			legend:{
+				visible:false
 			}
-			
 		});	
-		
 		$("#daysOnOilPieChart").kendoChart({
 			title : {
 				text : "Oil Days On per Rate Class"
 			},
 			seriesDefaults: {
+				labels: {
+			template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:oilDaysOnSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				color: 'white'
+			},
+			legend:{
+				visible:false
 			}
-			
 		});	
 		
 		$("#daysOnGasPieChart").kendoChart({
@@ -368,12 +542,22 @@ var chartref = {};
 			},
 			theme:"material",
 			seriesDefaults: {
+				labels: {
+					template: "#: category#",
+					position: "outsideEnd",
+					visible: true
+				},
 				type: "pie"
 			},
 			dataSource : pieChartDatasource,
 			series: [{data:gasDaysOnSeries}],
-			tooltip: {
-				visible: true
+			tooltip : {
+				visible : true,
+				template: "Rate Class: #: category# <br/> Days On: #=kendo.toString(value, 'n0')#",
+				color: 'white'
+			},
+			legend:{
+				visible:false
 			}
 		});	
 	}
@@ -564,9 +748,6 @@ var chartref = {};
                     fileType: 'Spreadsheet (xlsx)',
                     ext: 'excel'
                 }, {
-                    fileType: 'Spreadsheet (csv)',
-                    ext: 'excel_csv'
-                }, {
                     fileType: 'PDF',
                     ext: 'pdf'
                 }, {
@@ -605,31 +786,31 @@ var chartref = {};
         	var $map = $("#wellsMap"),
         		mapData = $map.data('kendoMap'),
         		$dataVizContainer = $('#data-visualizer');
-    		$("#map").show();
-			$("#lineChart, #pieChart, #barChart, #table").hide();
+    		$("#map").css({'position':'static'});
+			$("#lineChart, #pieChart, #barChart, #table").css({'position':'absolute'});
         },
         loadPieChart: function() {
         	if(chartref['pie']){
         		chartref['pie'].resize();
         	}
-			$("#pieChart").show();
-			$("#lineChart, #map, #barChart, #table").hide();
+			$("#pieChart").css({'position':'static'});
+			$("#lineChart, #map, #barChart, #table").css({'position':'absolute'});
         	
         },
         loadLineChart: function() {
         	if(chartref['line']){
         		chartref['line'].resize();
         	}
-        	$("#lineChart").show();
-			$("#pieChart, #map, #barChart, #table").hide();
+        	$("#lineChart").css({'position':'static'});
+			$("#pieChart, #map, #barChart, #table").css({'position':'absolute'});
         },
         loadBarGraph: function() {
-        	$("#barChart").show();
-			$("#pieChart, #map, #lineChart, #table").hide();
+        	$("#barChart").css({'position':'static'});
+			$("#pieChart, #map, #lineChart, #table").css({'position':'absolute'});
         },
 		loadTable: function() {
-        	$("#table").show();
-			$("#pieChart, #map, #lineChart, #barChart").hide();
+        	$("#table").css({'position':'static'});
+			$("#pieChart, #map, #lineChart, #barChart").css({'position':'absolute'});
         },
         loadExportView: function() {
             $('#modal').data('kendoWindow').open().center();
@@ -639,6 +820,16 @@ var chartref = {};
 }());
 //begin modal events 
 (function() {
+    utils.constants = {
+        XML_OPEN_TAG: '<?xml version="1.0" encoding="UTF-8"?>\n',
+        OPEN_TAG: '<',
+        END_TAG: '>',
+        FORWARD_SLASH: '/',
+        ROW: 'row_',
+        NEW_LINE: '\n',
+        TAB: '\t'
+
+    };	
     //create utility functions
     utils.gridJson2Xml = function(obj) {
         var xml = '';
@@ -677,45 +868,49 @@ var chartref = {};
         element.click();
         document.body.removeChild(element);
     };
-    utils.validateFilename = function(filename){
-    	var regex  = new RegExp("/^\.[0-9a-z]+$/i");
-    	return regex.test(filename);
-    };
     var modalEvents = {
         exportRawData: function() {
             var fileType = $('#modal').find('#export-type').data('kendoDropDownList').value(),
             	$filenameInput = $('#modal').find('#filename'), 
+            	$grid = $('#table').data('kendoGrid'),
                 userFilename = $filenameInput.val(),
                 saveFileName = (userFilename) ? userFilename : 'export.' + fileType,
                 exportType = {
                     JSON: 'json',
                     EXCEL: 'excel',
                     XML: 'xml',
-                    PDF: 'pdf',
-                    CSV: 'csv'
+                    PDF: 'pdf'
                 };
-                console.log(utils.validateFilename(saveFileName));
-                if(!utils.validateFilename(saveFileName)){
-                	saveFileName += '.' + fileType;
-                }
-            switch (true) {
-                case fileType === exportType.JSON:
-                    var gridJSON = DOE.database.view(); //filtered datasource
+            switch (fileType) {
+                case exportType.JSON:{
+                    var gridJSON = $grid.dataSource.view(); //filtered datasource
                     utils.clientSideDownload(saveFileName, JSON.stringify(gridJSON));
                     break;
-                case fileType === exportType.EXCEL:
+                }
+                case exportType.EXCEL:{
                     $grid.saveAsExcel();
                     break;
-                case fileType === exportType.XML:
-                    var gridJSON = DOE.database.view(); //filtered datasource
+                }
+                case exportType.XML:{
+                    var gridJSON = $grid.dataSource.view(), //filtered datasource
                         xml = utils.gridJson2Xml(gridJSON);
                     utils.clientSideDownload(saveFileName, xml);
                     break;
-                case fileType === exportType.PDF:
-                    $grid.saveAsPDF();
+                }
+                case exportType.PDF:{
+                	//topkek
+                    $("#table").css({'position':'static','margin-top':'1000px'});
+                    $grid.saveAsPDF().done(function(){
+                   		 $("#table").css({'position':'absolute','margin-top':'0px'});
+                    	
+                    });
                     break;
-                default:
+                }
+                default:{
                     console.log('no type found. . .');
+                    break;
+                }
+                
             };
         },
         cancelExport: function() {

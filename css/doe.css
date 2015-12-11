@@ -95,7 +95,8 @@ html, body {
   position: relative;
   width: 100%;
   height: calc(100% - 3px - 60px);
-  margin-top: 3px; }
+  margin-top: 3px;
+  overflow-x: hidden; }
 
 #sidebar {
   background-color: black;
@@ -151,17 +152,20 @@ html, body {
 #data-visualizer {
   text-align: center;
   padding: 5px 0 0 0;
-  height: 99%; }
+  height: 100%;
+  width: 90%;
+  margin: auto;
+  position: relative; }
   #data-visualizer > div {
-    width: 90%;
-    position: static;
-    margin: auto;
+    width: 100%;
     height: 600px; }
 
 #table {
-  display: none; }
+  position: absolute;
+  left: 120%; }
 
 #map {
+<<<<<<< HEAD
   display: block;
   width: 100%; 
   height: 600px;
@@ -176,12 +180,37 @@ html, body {
   display: none; 
   height: 600px;
 }
+=======
+  left: 120%; }
+  #map > div {
+    height: 400px;
+    width: 100%; }
+
+#barChart {
+  position: absolute;
+  left: 120%; }
+  #barChart > div {
+    height: 400px;
+    width: 100%; }
+
+#pieChart {
+  position: absolute;
+  left: 120%; }
+  #pieChart > div {
+    width: 95%;
+    display: flex; }
+    #pieChart > div > div {
+      height: 400px;
+      width: 49%;
+      flex: 1; }
+>>>>>>> 109aece7e51f20d033b5cba0653e13aa5ec30e1a
 
 #lineChart {
-  display: inline-block;
-  position: static !important;
-  height: 600px;
-  display: none; }
+  position: absolute;
+  left: 120%; }
+  #lineChart > div {
+    height: 400px;
+    width: 100%; }
 
 .modal-row label {
   display: block;
@@ -193,18 +222,25 @@ html, body {
   padding: 5px;
   width: 388px; }
 
-#wellsMap {
-  height: 600px; }
-
 #modal-actions {
   text-align: right;
   margin-top: 20px; }
   #modal-actions button {
     margin-left: 5px; }
 
+#filter-label {
+  margin: 10px 0 0 20px;
+  font-weight: bold;
+  font-size: 20px;
+  display: block; }
+
 .filter-section {
   margin: 10px;
   padding: 10px; }
+  .filter-section .k-widget.k-dropdown.k-header {
+    margin: 0 0 10px 0; }
+  .filter-section input {
+    display: none; }
 
 .k-widget.k-window {
   padding: 15px !important; }
